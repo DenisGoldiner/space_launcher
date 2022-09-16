@@ -1,5 +1,6 @@
 # space_launcher
 
+
 ## The Challenge
 Imagine it’s 2049 and you are working for a company called SpaceTrouble that sends people to different places in our solar system. 
 You are not the only one working in this industry. Your biggest competitor is a less known company called SpaceX. 
