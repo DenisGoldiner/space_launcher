@@ -6,6 +6,7 @@ import (
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"github.com/DenisGoldiner/space_launcher/pkg"
 	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type LaunchDBRequester interface {
@@ -18,10 +19,16 @@ type UserDBRequester interface {
 	GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error)
 }
 
+type SpaceXAdapter interface {
+	GetLaunchpad(ctx context.Context, launchpadID string) ([]entities.Launchpad, error)
+	GetConflictingLaunches(ctx context.Context, launchpadID string, date time.Time) (entities.Launch, error)
+}
+
 type SpaceLauncherService struct {
-	DBCon      *sqlx.DB
-	LaunchRepo LaunchDBRequester
-	UserRepo   UserDBRequester
+	DBCon        *sqlx.DB
+	LaunchRepo   LaunchDBRequester
+	UserRepo     UserDBRequester
+	SpaceXClient SpaceXAdapter
 }
 
 func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entities.User][]entities.Launch, error) {

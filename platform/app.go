@@ -3,6 +3,7 @@ package platform
 import (
 	"context"
 	"github.com/DenisGoldiner/space_launcher/internal/api"
+	"github.com/DenisGoldiner/space_launcher/internal/infra/adapter"
 	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
 	"github.com/DenisGoldiner/space_launcher/internal/service"
 	"github.com/jmoiron/sqlx"
@@ -53,7 +54,8 @@ func RunApp() error {
 func buildHandlers(dbCon *sqlx.DB) map[string]http.Handler {
 	lr := repo.LaunchRepo{}
 	ur := repo.UserRepo{}
-	sls := service.SpaceLauncherService{DBCon: dbCon, LaunchRepo: lr, UserRepo: ur}
+	sxc := adapter.SpaceXClient{}
+	sls := service.SpaceLauncherService{DBCon: dbCon, LaunchRepo: lr, UserRepo: ur, SpaceXClient: sxc}
 	slh := api.SpaceLauncherHTTPHandler{Service: sls}
 
 	return map[string]http.Handler{
