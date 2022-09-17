@@ -7,7 +7,7 @@ import (
 )
 
 func NewRouter() http.Handler {
-	slh := api.SpaceLauncherHandler{}
+	slh := api.SpaceLauncherHTTPHandler{}
 
 	r := http.NewServeMux()
 	r.Handle("/bookings", slh)

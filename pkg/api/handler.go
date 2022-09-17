@@ -15,10 +15,13 @@ const (
 	ContentTypeValueJSON = "application/json; charset=utf-8"
 )
 
-type SpaceLauncherHandler struct {
+// SpaceLauncherHTTPHandler is handler for bookings endpoints
+type SpaceLauncherHTTPHandler struct {
 }
 
-func (slh SpaceLauncherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+// ServeHTTP implements the http.Handler interface.
+// it adds all supported endpoints to the router.
+func (slh SpaceLauncherHTTPHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		slh.GetBookings(w, r)
@@ -31,7 +34,7 @@ func (slh SpaceLauncherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 	}
 }
 
-func (slh SpaceLauncherHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
+func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetBookings")
 
 	if err := WriteJSON(w, http.StatusOK, nil); err != nil {
@@ -39,13 +42,13 @@ func (slh SpaceLauncherHandler) GetBookings(w http.ResponseWriter, r *http.Reque
 	}
 }
 
-func (slh SpaceLauncherHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
+func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func (slh SpaceLauncherHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
+func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
 
 	w.WriteHeader(http.StatusNoContent)

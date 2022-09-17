@@ -7,7 +7,7 @@ import (
 )
 
 func newTestRouter(t *testing.T) http.Handler {
-	slh := api.SpaceLauncherHandler{}
+	slh := api.SpaceLauncherHTTPHandler{}
 
 	r := http.NewServeMux()
 	r.Handle("/bookings", slh)
