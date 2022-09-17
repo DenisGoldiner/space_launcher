@@ -19,8 +19,14 @@ type UserEntity struct {
 type UserRepo struct{}
 
 func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error) {
+	getAllUsersQuery := `SELECT id, first_name, last_name, gender, birthday FROM "user"`
 
-	return nil, nil
+	var allUsers []entities.User
+	if err := dbExec.QueryRowxContext(ctx, getAllUsersQuery).StructScan(&allUsers); err != nil {
+		return nil, err
+	}
+	
+	return allUsers, nil
 }
 
 func (ur UserRepo) SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entities.User) (entities.User, error) {
