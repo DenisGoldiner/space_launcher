@@ -38,6 +38,10 @@ func RunApp() error {
 		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
 	}
 
+	if err := MigrateUp(dbCon); err != nil {
+		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+	}
+
 	handlers := buildHandlers(dbCon)
 	router := NewRouter(handlers)
 

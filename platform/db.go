@@ -4,7 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const driverName = "pgx"
+const driverName = "postgres"
 
 // NewConnection create a connection to a postgres
 func NewConnection(conf DBConfig) (*sqlx.DB, error) {
