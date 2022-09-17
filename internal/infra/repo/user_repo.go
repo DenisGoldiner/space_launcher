@@ -29,7 +29,7 @@ func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]e
 
 	var allUsers []entities.User
 
-	if rows.Next() {
+	for rows.Next() {
 		var user UserEntity
 		if err := rows.StructScan(&user); err != nil {
 			return nil, err

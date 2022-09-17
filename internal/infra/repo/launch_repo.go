@@ -29,13 +29,13 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 
 	var allLaunches []entities.Launch
 
-	if rows.Next() {
-		var launch entities.Launch
+	for rows.Next() {
+		var launch LaunchEntity
 		if err := rows.StructScan(&launch); err != nil {
 			return nil, err
 		}
 
-		allLaunches = append(allLaunches, launch)
+		allLaunches = append(allLaunches, entities.Launch(launch))
 	}
 
 	return allLaunches, nil
