@@ -27,3 +27,5 @@ type LaunchResource struct {
 	Destination string    `json:"destination"`
 	LaunchDate  time.Time `json:"launch_date"`
 }
+
+// TODO: add validation
