@@ -3,7 +3,6 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
 )
@@ -17,16 +16,6 @@ const (
 )
 
 type SpaceLauncherHandler struct {
-}
-
-func (slh SpaceLauncherHandler) Extend(r chi.Router) {
-	r.Route(
-		"/bookings", func(r chi.Router) {
-			r.Get("/", slh.GetBookings)
-			r.Post("/", slh.CreateBooking)
-			r.Delete("/", slh.DeleteBooking)
-		},
-	)
 }
 
 func (slh SpaceLauncherHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
