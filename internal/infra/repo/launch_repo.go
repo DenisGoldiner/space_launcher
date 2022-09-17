@@ -21,9 +21,21 @@ type LaunchRepo struct{}
 func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error) {
 	getAllLaunchesQuery := `SELECT id, launchpad_id, destination, launch_date, user_id FROM "launch"`
 
-	var allLaunches []entities.Launch
-	if err := dbExec.QueryRowxContext(ctx, getAllLaunchesQuery).StructScan(&allLaunches); err != nil {
+	rows, err := dbExec.QueryxContext(ctx, getAllLaunchesQuery)
+	if err != nil {
 		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	var allLaunches []entities.Launch
+
+	if rows.Next() {
+		var launch entities.Launch
+		if err := rows.StructScan(&launch); err != nil {
+			return nil, err
+		}
+
+		allLaunches = append(allLaunches, launch)
 	}
 
 	return allLaunches, nil

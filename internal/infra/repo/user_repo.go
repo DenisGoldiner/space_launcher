@@ -21,11 +21,23 @@ type UserRepo struct{}
 func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error) {
 	getAllUsersQuery := `SELECT id, first_name, last_name, gender, birthday FROM "user"`
 
-	var allUsers []entities.User
-	if err := dbExec.QueryRowxContext(ctx, getAllUsersQuery).StructScan(&allUsers); err != nil {
+	rows, err := dbExec.QueryxContext(ctx, getAllUsersQuery)
+	if err != nil {
 		return nil, err
 	}
-	
+	defer func() { _ = rows.Close() }()
+
+	var allUsers []entities.User
+
+	if rows.Next() {
+		var user UserEntity
+		if err := rows.StructScan(&user); err != nil {
+			return nil, err
+		}
+
+		allUsers = append(allUsers, entities.User(user))
+	}
+
 	return allUsers, nil
 }
 
