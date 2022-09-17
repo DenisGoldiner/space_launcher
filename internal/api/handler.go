@@ -45,6 +45,14 @@ func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.R
 func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 
+	payload, err := parseCreateBookingRequest(r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	log.Printf("%#v", payload)
+
 	w.WriteHeader(http.StatusNoContent)
 }
 

@@ -1,13 +1,9 @@
-package platform
+package pkg
 
 import "fmt"
 
 const (
 	errWrapFILOFormat = "%s; %w"
-)
-
-var (
-	BodyDecodeErr = "failed to decode the body"
 )
 
 func WrapErr(cause string, err error) error {

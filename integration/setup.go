@@ -1,7 +1,7 @@
 package integration
 
 import (
-	"github.com/DenisGoldiner/space_launcher/pkg/api"
+	"github.com/DenisGoldiner/space_launcher/internal/api"
 	"net/http"
 	"testing"
 )

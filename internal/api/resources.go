@@ -1,7 +1,7 @@
 package api
 
 import (
-	"github.com/DenisGoldiner/space_launcher/pkg/entities"
+	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"time"
 )
 
