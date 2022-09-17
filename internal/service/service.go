@@ -14,6 +14,7 @@ type UserDBRequester interface {
 }
 
 type SpaceLauncherService struct {
+	DBCon      *sqlx.DB
 	LaunchRepo LaunchDBRequester
 	UserRepo   UserDBRequester
 }

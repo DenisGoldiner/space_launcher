@@ -2,10 +2,19 @@ package platform
 
 import (
 	"context"
+	"github.com/DenisGoldiner/space_launcher/internal/api"
+	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
+	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/jmoiron/sqlx"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+)
+
+const (
+	failedToStartMsg = "failed to start the space_launcher"
 )
 
 func RunApp() error {
@@ -15,11 +24,35 @@ func RunApp() error {
 	signal.Notify(gracefulStop, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		trapped := <-gracefulStop
-		log.Printf("shutting down the HTTP server beacuse of %q signal\n", trapped.String())
+		log.Printf("shutting down the space_launcher beacuse of %q signal\n", trapped.String())
 		cancel()
 	}()
 
-	RunHTTPServer(ctx, NewRouter())
+	conf, err := LoadConfig()
+	if err != nil {
+		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+	}
+
+	dbCon, err := NewConnection(conf.DBConfig)
+	if err != nil {
+		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+	}
+
+	handlers := buildHandlers(dbCon)
+	router := NewRouter(handlers)
+
+	RunHTTPServer(ctx, router)
 
 	return nil
+}
+
+func buildHandlers(dbCon *sqlx.DB) map[string]http.Handler {
+	lr := repo.LauncherRepo{}
+	ur := repo.UserRepo{}
+	sls := service.SpaceLauncherService{DBCon: dbCon, LaunchRepo: lr, UserRepo: ur}
+	slh := api.SpaceLauncherHTTPHandler{Service: sls}
+
+	return map[string]http.Handler{
+		"/bookings": slh,
+	}
 }
