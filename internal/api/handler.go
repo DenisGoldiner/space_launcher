@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -17,7 +18,7 @@ const (
 )
 
 type SpaceLauncherInteractor interface {
-	CreateBooking(u entities.User, l entities.Launch) error
+	CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error
 }
 
 // SpaceLauncherHTTPHandler is handler for bookings endpoints
@@ -51,6 +52,8 @@ func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.R
 func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 
+	ctx := r.Context()
+
 	payload, err := parseCreateBookingRequest(r)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -60,10 +63,15 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 
 	log.Printf("%#v", payload)
 
-	usr := entities.User(payload.UserResource)
+	usr := entities.User{
+		FirstName: payload.FirstName,
+		LastName:  payload.LastName,
+		Gender:    payload.Gender,
+		Birthday:  payload.Birthday,
+	}
 	launch := entities.Launch(payload.LaunchResource)
 
-	if err := slh.Service.CreateBooking(usr, launch); err != nil {
+	if err := slh.Service.CreateBooking(ctx, usr, launch); err != nil {
 		handleCreateBookingError(w, err)
 		logError(err)
 		return
