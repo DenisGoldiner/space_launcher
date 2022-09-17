@@ -14,10 +14,7 @@ func Test_integration_CreateBooking_ok(t *testing.T) {
 	recorder := httptest.NewRecorder()
 	router := newTestRouter(t)
 
-	expectedBody := "null"
-
 	router.ServeHTTP(recorder, req)
 
 	require.Equal(t, http.StatusNoContent, recorder.Code)
-	require.JSONEq(t, expectedBody, recorder.Body.String())
 }

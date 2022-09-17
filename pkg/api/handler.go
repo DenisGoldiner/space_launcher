@@ -42,17 +42,13 @@ func (slh SpaceLauncherHandler) GetBookings(w http.ResponseWriter, r *http.Reque
 func (slh SpaceLauncherHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 
-	if err := WriteJSON(w, http.StatusNoContent, nil); err != nil {
-		http.Error(w, fmt.Sprintf("output serialization failed, %v", err), http.StatusInternalServerError)
-	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (slh SpaceLauncherHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
 
-	if err := WriteJSON(w, http.StatusNoContent, nil); err != nil {
-		http.Error(w, fmt.Sprintf("output serialization failed, %v", err), http.StatusInternalServerError)
-	}
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // WriteJSON with http.ResponseWriter.
