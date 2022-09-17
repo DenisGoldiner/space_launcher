@@ -10,10 +10,9 @@ CREATE TABLE "user"
     gender      GENDER_TYPE NOT NULL,
     birthday    DATE        NOT NULL,
     created     TIMESTAMP   NOT NULL DEFAULT NOW(),
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT user_unique UNIQUE (first_name, last_name, birthday)
 );
-
-CREATE UNIQUE INDEX idx_unique_user ON "user" (first_name, last_name, birthday);
 
 CREATE TYPE DESTINATION_TYPE AS ENUM ('Mars', 'Moon', 'Pluto', 'Asteroid Belt', 'Europa', 'Titan', 'Ganymede');
 
@@ -26,7 +25,8 @@ CREATE TABLE "launch"
     user_id         UUID                NOT NULL,
     created         TIMESTAMP           NOT NULL DEFAULT NOW(),
     PRIMARY KEY (id),
-    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user" (id)
+    CONSTRAINT fk_user FOREIGN KEY (user_id) REFERENCES "user" (id),
+    CONSTRAINT launch_unique UNIQUE (launchpad_id, launch_date)
 );
 
 CREATE UNIQUE INDEX idx_unique_launch ON "launch" (launchpad_id, launch_date);
