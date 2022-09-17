@@ -60,8 +60,8 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 
 	log.Printf("%#v", payload)
 
-	usr := entities.User{}
-	launch := entities.Launch{}
+	usr := entities.User(payload.UserResource)
+	launch := entities.Launch(payload.LaunchResource)
 
 	if err := slh.Service.CreateBooking(usr, launch); err != nil {
 		handleCreateBookingError(w, err)
