@@ -20,6 +20,7 @@ const (
 
 type SpaceLauncherInteractor interface {
 	CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error
+	GetAllBookings(ctx context.Context) (map[entities.User][]entities.Launch, error)
 }
 
 // SpaceLauncherHTTPHandler is handler for bookings endpoints
@@ -42,6 +43,8 @@ func (slh SpaceLauncherHTTPHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 	}
 }
 
+// GetBookings
+// GET: /bookings
 func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetBookings")
 
@@ -50,6 +53,8 @@ func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.R
 	}
 }
 
+// CreateBooking
+// POST: /bookings
 func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 

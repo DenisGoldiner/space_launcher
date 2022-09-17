@@ -18,6 +18,11 @@ type UserEntity struct {
 
 type UserRepo struct{}
 
+func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error) {
+
+	return nil, nil
+}
+
 func (ur UserRepo) SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entities.User) (entities.User, error) {
 	saveUserQuery := `
 		INSERT INTO "user" (first_name, last_name, gender, birthday)

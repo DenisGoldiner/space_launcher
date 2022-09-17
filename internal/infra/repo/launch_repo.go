@@ -18,6 +18,10 @@ type LaunchEntity struct {
 
 type LaunchRepo struct{}
 
+func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error) {
+	return nil, nil
+}
+
 func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error {
 	saveLaunchQuery := `INSERT INTO "launch" (launchpad_id, destination, launch_date, user_id) VALUES ($1, $2, $3, $4)`
 	if _, err := dbExec.ExecContext(
