@@ -8,6 +8,7 @@ import (
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"log"
 	"net/http"
+	"time"
 )
 
 const (
@@ -67,9 +68,13 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 		FirstName: payload.FirstName,
 		LastName:  payload.LastName,
 		Gender:    payload.Gender,
-		Birthday:  payload.Birthday,
+		Birthday:  time.Time(payload.Birthday),
 	}
-	launch := entities.Launch(payload.LaunchResource)
+	launch := entities.Launch{
+		LaunchpadID: payload.LaunchpadID,
+		Destination: payload.Destination,
+		LaunchDate:  time.Time(payload.LaunchDate),
+	}
 
 	if err := slh.Service.CreateBooking(ctx, usr, launch); err != nil {
 		handleCreateBookingError(w, err)

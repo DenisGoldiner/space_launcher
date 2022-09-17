@@ -23,7 +23,7 @@ func (ur UserRepo) SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entit
 		INSERT INTO "user" (first_name, last_name, gender, birthday)
 		VALUES ($1, $2, $3, $4)
 		ON CONFLICT ON CONSTRAINT user_unique DO UPDATE SET first_name = EXCLUDED.first_name
-		RETURNING (id, first_name, last_name, gender, birthday)`
+		RETURNING id, first_name, last_name, gender, birthday`
 
 	var savedUser UserEntity
 
