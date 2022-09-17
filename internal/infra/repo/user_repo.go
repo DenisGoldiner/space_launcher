@@ -7,7 +7,8 @@ import (
 	"time"
 )
 
-type User struct {
+// UserEntity represents the user DB entity.
+type UserEntity struct {
 	ID        string          `db:"id"`
 	FirstName string          `db:"first_name"`
 	LastName  string          `db:"last_name"`
@@ -24,7 +25,7 @@ func (ur UserRepo) SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entit
 		ON CONFLICT ON CONSTRAINT user_unique DO UPDATE SET first_name = EXCLUDED.first_name
 		RETURNING (id, first_name, last_name, gender, birthday)`
 
-	var savedUser User
+	var savedUser UserEntity
 
 	row := dbExec.QueryRowxContext(ctx, saveUserQuery, u.FirstName, u.LastName, u.Gender, u.Birthday)
 	if err := row.StructScan(&savedUser); err != nil {

@@ -51,7 +51,7 @@ func RunApp() error {
 }
 
 func buildHandlers(dbCon *sqlx.DB) map[string]http.Handler {
-	lr := repo.LauncherRepo{}
+	lr := repo.LaunchRepo{}
 	ur := repo.UserRepo{}
 	sls := service.SpaceLauncherService{DBCon: dbCon, LaunchRepo: lr, UserRepo: ur}
 	slh := api.SpaceLauncherHTTPHandler{Service: sls}

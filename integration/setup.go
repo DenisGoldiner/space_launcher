@@ -10,7 +10,7 @@ import (
 
 func newTestRouter(t *testing.T) http.Handler {
 	ur := repo.UserRepo{}
-	lr := repo.LauncherRepo{}
+	lr := repo.LaunchRepo{}
 	sls := service.SpaceLauncherService{LaunchRepo: lr, UserRepo: ur}
 	slh := api.SpaceLauncherHTTPHandler{Service: sls}
 
