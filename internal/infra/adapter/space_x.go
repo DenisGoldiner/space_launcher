@@ -25,7 +25,7 @@ func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, launchpadID string) (e
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, http.NoBody)
 	if err != nil {
-		return entities.Launchpad{}, pkg.WrapErr("create request: %w", err)
+		return entities.Launchpad{}, pkg.WrapErr("failed to create the request", err)
 	}
 
 	responseBody, err := sxc.Client.SendRequest(req)
@@ -58,12 +58,12 @@ func (sxc SpaceXClient) GetPlannedLaunches(ctx context.Context, launchpadID stri
 
 	body, err := json.Marshal(queryOptions)
 	if err != nil {
-		return nil, err
+		return nil, pkg.WrapErr("failed to encode the request body", err)
 	}
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, bytes.NewReader(body))
 	if err != nil {
-		return nil, pkg.WrapErr("create request: %w", err)
+		return nil, pkg.WrapErr("failed to create the request", err)
 	}
 
 	responseBody, err := sxc.Client.SendRequest(req)

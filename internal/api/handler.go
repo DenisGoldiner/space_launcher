@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
+	"github.com/DenisGoldiner/space_launcher/internal/service"
 	"log"
 	"net/http"
 )
@@ -51,7 +52,7 @@ func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.R
 
 	allBookings, err := slh.Service.GetAllBookings(ctx)
 	if err != nil {
-		handleCreateBookingError(w, err)
+		handleGetBookingsError(w, err)
 		logError(err)
 		return
 	}
@@ -105,9 +106,10 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 
 func handleCreateBookingError(w http.ResponseWriter, err error) {
 	switch {
-	// TODO: define cases
-	case errors.Is(err, nil):
+	case errors.Is(err, service.BusinessValidationErr):
 		http.Error(w, err.Error(), http.StatusBadRequest)
+	case errors.Is(err, service.ExternalVendorAPIErr):
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}

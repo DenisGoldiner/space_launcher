@@ -3,8 +3,7 @@ package service
 import (
 	"context"
 	"errors"
-	"log"
-
+	"fmt"
 	"github.com/jmoiron/sqlx"
 
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
@@ -74,25 +73,47 @@ func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.Us
 }
 
 func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.Launch) error {
+	if err := sls.validateLaunchpadReadiness(ctx, l); err != nil {
+		if errors.Is(err, ExternalVendorAPIErr) {
+			return err
+		}
+
+		return pkg.WrapErr(err.Error(), BusinessValidationErr)
+	}
+
+	if err := sls.validateExternalBookings(ctx, l); err != nil {
+		if errors.Is(err, ExternalVendorAPIErr) {
+			return err
+		}
+
+		return pkg.WrapErr(err.Error(), BusinessValidationErr)
+	}
+
+	return nil
+}
+
+func (sls SpaceLauncherService) validateLaunchpadReadiness(ctx context.Context, l entities.Launch) error {
 	foundLaunchpad, err := sls.SpaceXClient.GetLaunchpad(ctx, l.LaunchpadID)
 	if err != nil {
-		return err
+		return pkg.WrapErr(fmt.Sprintf("for getting the launchpad, %v", err), ExternalVendorAPIErr)
 	}
 
 	if foundLaunchpad.Status == entities.LaunchpadStatusRetired {
-		return errors.New("can not plan booking for retired launchpad")
+		return RetiredLaunchpadErr
 	}
 
+	return nil
+}
+
+func (sls SpaceLauncherService) validateExternalBookings(ctx context.Context, l entities.Launch) error {
 	timeRange := entities.ToDayRange(l.LaunchDate)
 	plannedExternalLaunches, err := sls.SpaceXClient.GetPlannedLaunches(ctx, l.LaunchpadID, timeRange)
 	if err != nil {
-		return err
+		return pkg.WrapErr(fmt.Sprintf("for getting the launches, %v", err), ExternalVendorAPIErr)
 	}
 
-	log.Printf("%#v", plannedExternalLaunches)
-
 	if len(plannedExternalLaunches) > 0 {
-		return errors.New("the date is planned by an external vendor")
+		return TakenDateErr
 	}
 
 	return nil
