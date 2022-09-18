@@ -9,17 +9,16 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
-const (
-	dateLayout = "2006-01-02"
-)
+const dateLayout = "2006-01-02"
 
-type LaunchesByUser struct {
+// LaunchesByUserResource represents response for GetBookings.
+type LaunchesByUserResource struct {
 	UserResource
 	Launches []LaunchResource
 }
 
-func launchByUsersToResource(allBookings map[entities.User][]entities.Launch) []LaunchesByUser {
-	allBookingsResource := make([]LaunchesByUser, 0, len(allBookings))
+func launchByUsersToResource(allBookings map[entities.User][]entities.Launch) []LaunchesByUserResource {
+	allBookingsResource := make([]LaunchesByUserResource, 0, len(allBookings))
 
 	for user, launches := range allBookings {
 		launchesResource := make([]LaunchResource, len(launches))
@@ -38,7 +37,7 @@ func launchByUsersToResource(allBookings map[entities.User][]entities.Launch) []
 			Birthday:  DateResource(user.Birthday),
 		}
 
-		allBookingsResource = append(allBookingsResource, LaunchesByUser{
+		allBookingsResource = append(allBookingsResource, LaunchesByUserResource{
 			UserResource: userResource,
 			Launches:     launchesResource,
 		})
@@ -53,6 +52,7 @@ type BookingResource struct {
 	LaunchResource
 }
 
+// Validate checks if the all BookingResource components are valid.
 func (br BookingResource) Validate() error {
 	if err := br.UserResource.Validate(); err != nil {
 		return pkg.WrapErr(err.Error(), ValidationFailedErr)
@@ -73,6 +73,7 @@ type UserResource struct {
 	Birthday  DateResource    `json:"birthday"`
 }
 
+// Validate checks if the all UserResource components are valid.
 func (ur UserResource) Validate() error {
 	if ur.FirstName == "" {
 		return pkg.WrapErr("for the user First Name", EmptyFieldErr)
@@ -109,6 +110,7 @@ type LaunchResource struct {
 	LaunchDate  DateResource         `json:"launch_date"`
 }
 
+// Validate checks if the all LaunchResource components are valid.
 func (lr LaunchResource) Validate() error {
 	if lr.LaunchpadID == "" {
 		return pkg.WrapErr("for the launchpad id", EmptyFieldErr)
@@ -135,6 +137,7 @@ func (lr LaunchResource) toEntitiesLaunch() entities.Launch {
 
 type DateResource time.Time
 
+// UnmarshalJSON decodes the custom date format.
 func (d *DateResource) UnmarshalJSON(b []byte) error {
 	s := strings.Trim(string(b), "\"")
 	date, err := time.Parse(dateLayout, s)
@@ -147,11 +150,13 @@ func (d *DateResource) UnmarshalJSON(b []byte) error {
 	return nil
 }
 
+// MarshalJSON encodes the custom date format.
 func (d *DateResource) MarshalJSON() ([]byte, error) {
 	t := time.Time(*d)
 	return []byte(fmt.Sprintf("%q", t.Format(dateLayout))), nil
 }
 
+// Validate checks that the date has not a default value.
 func (d *DateResource) Validate() error {
 	if time.Time(*d).IsZero() {
 		return EmptyFieldErr

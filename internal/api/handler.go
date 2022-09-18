@@ -73,7 +73,7 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 
 	var payload BookingResource
 
-	if err := parseCreateBookingRequest(r, &payload); err != nil {
+	if err := pkg.ParseRequestPayload(r, &payload); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logError(err)
 		return
@@ -97,6 +97,8 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusNoContent)
 }
 
+// DeleteBooking
+// DELETE: /space_launcher/bookings
 func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
 
@@ -104,7 +106,7 @@ func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http
 
 	var payload LaunchResource
 
-	if err := parseCreateBookingRequest(r, &payload); err != nil {
+	if err := pkg.ParseRequestPayload(r, &payload); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logError(err)
 		return

@@ -1,0 +1,12 @@
+GET http://localhost:8080/bookings
+Accept: application/json
+
+###
+
+POST http://localhost:8080/bookings
+Accept: application/json
+
+###
+
+DELETE http://localhost:8080/bookings
+Accept: application/json
