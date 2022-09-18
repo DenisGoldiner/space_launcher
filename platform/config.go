@@ -2,9 +2,11 @@ package platform
 
 import (
 	"errors"
-	"github.com/DenisGoldiner/space_launcher/pkg"
-	"github.com/kelseyhightower/envconfig"
 	"time"
+
+	"github.com/kelseyhightower/envconfig"
+
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 var (

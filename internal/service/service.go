@@ -3,10 +3,12 @@ package service
 import (
 	"context"
 	"errors"
+	"log"
+
+	"github.com/jmoiron/sqlx"
+
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"github.com/DenisGoldiner/space_launcher/pkg"
-	"github.com/jmoiron/sqlx"
-	"log"
 )
 
 type LaunchDBRequester interface {
@@ -62,8 +64,6 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 
 	return allBookings, nil
 }
-
-// TODO: call SpaceX Client to validate
 
 // TODO: validate unique destinations per week
 

@@ -2,9 +2,11 @@ package repo
 
 import (
 	"context"
-	"github.com/DenisGoldiner/space_launcher/internal/entities"
-	"github.com/jmoiron/sqlx"
 	"time"
+
+	"github.com/jmoiron/sqlx"
+
+	"github.com/DenisGoldiner/space_launcher/internal/entities"
 )
 
 // UserEntity represents the user DB entity.

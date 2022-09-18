@@ -3,9 +3,10 @@ package api
 import (
 	"encoding/json"
 	"errors"
-	"github.com/DenisGoldiner/space_launcher/pkg"
 	"io"
 	"net/http"
+
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 func parseCreateBookingRequest(r *http.Request) (BookingResource, error) {

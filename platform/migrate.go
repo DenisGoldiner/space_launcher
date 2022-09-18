@@ -3,11 +3,13 @@ package platform
 import (
 	"errors"
 	"fmt"
-	"github.com/DenisGoldiner/space_launcher/pkg"
+
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
+
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 const migrationsPath = "./migrations"

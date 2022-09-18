@@ -3,11 +3,12 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_integration_CreateBooking_ok(t *testing.T) {

@@ -2,9 +2,10 @@ package api
 
 import (
 	"fmt"
-	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"strings"
 	"time"
+
+	"github.com/DenisGoldiner/space_launcher/internal/entities"
 )
 
 const (

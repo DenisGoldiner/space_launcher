@@ -2,17 +2,19 @@ package platform
 
 import (
 	"context"
-	"github.com/DenisGoldiner/space_launcher/internal/api"
-	"github.com/DenisGoldiner/space_launcher/internal/infra/adapter"
-	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
-	"github.com/DenisGoldiner/space_launcher/internal/service"
-	"github.com/DenisGoldiner/space_launcher/pkg"
-	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/jmoiron/sqlx"
+
+	"github.com/DenisGoldiner/space_launcher/internal/api"
+	"github.com/DenisGoldiner/space_launcher/internal/infra/adapter"
+	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
+	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 const (
