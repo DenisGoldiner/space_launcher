@@ -18,6 +18,16 @@ type LaunchEntity struct {
 	UserID      string    `db:"user_id"`
 }
 
+func (le LaunchEntity) toEntitiesLaunch() entities.Launch {
+	return entities.Launch{
+		ID:          le.ID,
+		LaunchpadID: le.LaunchpadID,
+		Destination: entities.Destination(le.Destination),
+		LaunchDate:  le.LaunchDate,
+		UserID:      le.UserID,
+	}
+}
+
 type LaunchRepo struct{}
 
 func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error) {
@@ -37,7 +47,7 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 			return nil, err
 		}
 
-		allLaunches = append(allLaunches, entities.Launch(launch))
+		allLaunches = append(allLaunches, launch.toEntitiesLaunch())
 	}
 
 	return allLaunches, nil

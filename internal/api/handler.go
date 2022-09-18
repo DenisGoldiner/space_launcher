@@ -5,11 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"log"
 	"net/http"
-	"time"
-
-	"github.com/DenisGoldiner/space_launcher/internal/entities"
 )
 
 const (
@@ -87,19 +85,14 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 		return
 	}
 
-	//log.Printf("%#v", payload)
+	if err := payload.Validate(); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logError(err)
+		return
+	}
 
-	usr := entities.User{
-		FirstName: payload.FirstName,
-		LastName:  payload.LastName,
-		Gender:    payload.Gender,
-		Birthday:  time.Time(payload.Birthday),
-	}
-	launch := entities.Launch{
-		LaunchpadID: payload.LaunchpadID,
-		Destination: payload.Destination,
-		LaunchDate:  time.Time(payload.LaunchDate),
-	}
+	usr := payload.UserResource.toEntitiesUser()
+	launch := payload.LaunchResource.toEntitiesLaunch()
 
 	if err := slh.Service.CreateBooking(ctx, usr, launch); err != nil {
 		handleCreateBookingError(w, err)

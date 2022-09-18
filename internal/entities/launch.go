@@ -5,7 +5,7 @@ import "time"
 type Launch struct {
 	ID          string
 	LaunchpadID string
-	Destination string
+	Destination Destination
 	LaunchDate  time.Time
 	UserID      string
 }
