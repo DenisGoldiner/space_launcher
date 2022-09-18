@@ -45,7 +45,7 @@ func (slh SpaceLauncherHTTPHandler) ServeHTTP(w http.ResponseWriter, r *http.Req
 }
 
 // GetBookings
-// GET: /bookings
+// GET: /space_launcher/bookings
 func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.Request) {
 	log.Println("GetBookings")
 
@@ -74,7 +74,7 @@ func handleGetBookingsError(w http.ResponseWriter, err error) {
 }
 
 // CreateBooking
-// POST: /bookings
+// POST: /space_launcher/bookings
 func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("CreateBooking")
 
