@@ -18,6 +18,7 @@ const (
 	ContentTypeValueJSON = "application/json; charset=utf-8"
 )
 
+// SpaceLauncherInteractor is a service layer abstraction
 type SpaceLauncherInteractor interface {
 	CreateBooking(context.Context, entities.User, entities.Launch) error
 	GetAllBookings(context.Context) (map[entities.User][]entities.Launch, error)

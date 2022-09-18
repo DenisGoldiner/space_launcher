@@ -18,8 +18,10 @@ type UserEntity struct {
 	Birthday  time.Time       `db:"birthday"`
 }
 
+// UserRepo is a repo layer implementation for user actions.
 type UserRepo struct{}
 
+// GetAllUsers retrieves all users stored in the DB.
 func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error) {
 	getAllUsersQuery := `SELECT id, first_name, last_name, gender, birthday FROM "user"`
 
@@ -43,6 +45,7 @@ func (ur UserRepo) GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]e
 	return allUsers, nil
 }
 
+// SaveUser persists the user to the DB.
 func (ur UserRepo) SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entities.User) (entities.User, error) {
 	saveUserQuery := `
 		INSERT INTO "user" (first_name, last_name, gender, birthday)
