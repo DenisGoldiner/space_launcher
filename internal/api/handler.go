@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 	"log"
 	"net/http"
 
@@ -20,8 +21,9 @@ const (
 )
 
 type SpaceLauncherInteractor interface {
-	CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error
-	GetAllBookings(ctx context.Context) (map[entities.User][]entities.Launch, error)
+	CreateBooking(context.Context, entities.User, entities.Launch) error
+	GetAllBookings(context.Context) (map[entities.User][]entities.Launch, error)
+	DeleteBooking(context.Context, entities.Launch) error
 }
 
 // SpaceLauncherHTTPHandler is handler for bookings endpoints
@@ -111,6 +113,8 @@ func handleCreateBookingError(w http.ResponseWriter, err error) {
 func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
 
+	ctx := r.Context()
+
 	var payload LaunchResource
 
 	if err := parseCreateBookingRequest(r, &payload); err != nil {
@@ -120,12 +124,30 @@ func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http
 	}
 
 	if err := payload.Validate(); err != nil {
+		err := pkg.WrapErr(err.Error(), ValidationFailedErr)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logError(err)
 		return
 	}
 
+	launch := payload.toEntitiesLaunch()
+
+	if err := slh.Service.DeleteBooking(ctx, launch); err != nil {
+		handleDeleteBookingError(w, err)
+		logError(err)
+		return
+	}
+
 	w.WriteHeader(http.StatusNoContent)
+}
+
+func handleDeleteBookingError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Is(err, service.BookingNotFoundErr):
+		http.Error(w, err.Error(), http.StatusNotFound)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // WriteJSON with http.ResponseWriter.

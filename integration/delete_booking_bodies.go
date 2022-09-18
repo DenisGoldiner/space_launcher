@@ -16,6 +16,8 @@ func getDeleteBookingBody(t *testing.T, caseName string) io.Reader {
 		return deleteBookingEmptyDestinationBody()
 	case "not_supported_destination":
 		return deleteBookingNotSupportedDestinationBody()
+	case "not_existing_booking":
+		return deleteBookingNotExistingBookingBody()
 	default:
 		t.Fail()
 		return nil
@@ -51,6 +53,15 @@ func deleteBookingNotSupportedDestinationBody() io.Reader {
 		{
 			"launchpad_id": "5e9e4502f5090995de566f86",
 			"destination": "Earth",
+			"launch_date": "2008-08-03"
+		}`)
+}
+
+func deleteBookingNotExistingBookingBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"launchpad_id": "5e9e4502f5090995de566f86",
+			"destination": "Mars",
 			"launch_date": "2008-08-03"
 		}`)
 }

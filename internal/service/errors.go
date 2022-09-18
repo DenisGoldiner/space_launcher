@@ -9,4 +9,5 @@ var (
 	TakenDateErr            = errors.New("the launch date is planned")
 	TakenDestinationErr     = errors.New("the launch destination is planned for close dates")
 	ExternalVendorAPIErr    = errors.New("failed to call external vendor")
+	BookingNotFoundErr      = errors.New("the booking for launch does not exist")
 )

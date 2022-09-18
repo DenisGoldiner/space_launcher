@@ -47,13 +47,48 @@ func Test_integration_DeleteBooking_requestValidation(t *testing.T) {
 				tc.body = getCreateBookingBody(t, tcName)
 			}
 
-			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, bookingsURL, tc.body)
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, bookingsURL, tc.body)
 			require.NoError(t, err)
 			recorder := httptest.NewRecorder()
 			router.ServeHTTP(recorder, req)
 
 			// final test result comparison
 			require.Equal(t, http.StatusBadRequest, recorder.Code)
+			require.Equal(t, fmt.Sprintln(tc.expErr), recorder.Body.String())
+		})
+	}
+}
+
+func Test_integration_DeleteBooking_businessValidation(t *testing.T) {
+	t.Parallel()
+
+	testCases := map[string]struct {
+		expErr  string
+		expCode int
+	}{
+		"not_existing_booking": {
+			expErr:  "for launchpadID: \"5e9e4502f5090995de566f86\", date \"2008-08-03T00:00:00Z\"; the booking for launch does not exist",
+			expCode: http.StatusNotFound,
+		},
+	}
+
+	// we will fail without persisting any data to DB.
+	dbExec := setupDB(t)
+	router := newTestRouter(dbExec)
+
+	for tcName, tc := range testCases {
+		tcName, tc := tcName, tc
+
+		t.Run(tcName, func(t *testing.T) {
+			body := getDeleteBookingBody(t, tcName)
+
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, bookingsURL, body)
+			require.NoError(t, err)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			// final test result comparison
+			require.Equal(t, tc.expCode, recorder.Code)
 			require.Equal(t, fmt.Sprintln(tc.expErr), recorder.Body.String())
 		})
 	}
