@@ -133,5 +133,6 @@ func Test_integration_CreateBooking_ok(t *testing.T) {
 
 	router.ServeHTTP(recorder, req)
 
+	// final test result comparison
 	require.Equal(t, http.StatusNoContent, recorder.Code)
 }

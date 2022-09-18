@@ -41,6 +41,7 @@ func Test_integration_GetBookings_ok(t *testing.T) {
 
 	router.ServeHTTP(recorder, req)
 
+	// final test result comparison
 	require.Equal(t, http.StatusOK, recorder.Code)
 	require.JSONEq(t, expectedBody, recorder.Body.String())
 }
