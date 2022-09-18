@@ -86,7 +86,9 @@ func setupFixtures(t *testing.T, dbExec *sqlx.DB) {
 
 	launchFixtureQuery := `
 		INSERT INTO "launch" (launchpad_id, destination, launch_date, user_id)
-		VALUES ('5e9e4501f509094ba4566f84', 'Mars', '2021-01-01', $1)`
+		VALUES 
+		    ('5e9e4501f509094ba4566f84', 'Mars', '2021-01-01', $1),
+		    ('5e9e4502f509092b78566f87', 'Pluto', '2021-01-07', $1)`
 
 	_, err = dbExec.Exec(launchFixtureQuery, userID)
 	require.NoError(t, err)
