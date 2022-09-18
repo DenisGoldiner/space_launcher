@@ -83,7 +83,7 @@ func (sls SpaceLauncherService) isValidationErrors(err error) bool {
 		return false
 	}
 
-	validationErrors := [...]error{RetiredLaunchpadErr, TakenDateErr, TakenDestinationErr}
+	validationErrors := [...]error{RetiredLaunchpadErr, TakenDateErr, TakenDestinationErr, NotExistingLaunchpadErr}
 
 	for _, validationError := range validationErrors {
 		if errors.Is(err, validationError) {
@@ -138,6 +138,10 @@ func (sls SpaceLauncherService) validateLaunchpadReadiness(ctx context.Context, 
 	foundLaunchpad, err := sls.SpaceXClient.GetLaunchpad(ctx, l.LaunchpadID)
 	if err != nil {
 		return pkg.WrapErr(fmt.Sprintf("for getting the launchpad, %v", err), ExternalVendorAPIErr)
+	}
+
+	if foundLaunchpad.IsZero() {
+		return NotExistingLaunchpadErr
 	}
 
 	if foundLaunchpad.Status == entities.LaunchpadStatusRetired {

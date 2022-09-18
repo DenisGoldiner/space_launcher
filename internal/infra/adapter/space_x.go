@@ -28,10 +28,16 @@ func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, lID entities.Launchpad
 		return entities.Launchpad{}, pkg.WrapErr("failed to create the request", err)
 	}
 
-	responseBody, err := sxc.Client.SendRequest(req)
+	statusCode, responseBody, err := sxc.Client.SendRequest(req)
+	if statusCode == http.StatusNotFound {
+		return entities.Launchpad{}, nil
+	}
+
 	if err != nil {
 		return entities.Launchpad{}, pkg.WrapErr("failed execute the request", err)
 	}
+
+	defer func() { _ = responseBody.Close() }()
 
 	b, err := io.ReadAll(responseBody)
 	if err != nil {
@@ -70,10 +76,12 @@ func (sxc SpaceXClient) GetPlannedLaunches(
 		return nil, pkg.WrapErr("failed to create the request", err)
 	}
 
-	responseBody, err := sxc.Client.SendRequest(req)
+	_, responseBody, err := sxc.Client.SendRequest(req)
 	if err != nil {
 		return nil, pkg.WrapErr("failed execute the request", err)
 	}
+	
+	defer func() { _ = responseBody.Close() }()
 
 	b, err := io.ReadAll(responseBody)
 	if err != nil {

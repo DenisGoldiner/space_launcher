@@ -28,6 +28,12 @@ func getCreateBookingBody(t *testing.T, caseName string) io.Reader {
 		return createBookingEmptyDestinationBody()
 	case "not_supported_destination":
 		return createBookingNotSupportedDestinationBody()
+	case "not_existing_launchpad":
+		return createBookingNotExistingLaunchpadBody()
+	case "retired_launchpad":
+		return createBookingRetiredLaunchpadBody()
+	case "planned_external":
+		return createBookingPlannedExternalBody()
 	default:
 		t.Fail()
 		return nil
@@ -157,15 +163,41 @@ func createBookingNotSupportedDestinationBody() io.Reader {
 		}`)
 }
 
-//func createBookingOkBody() io.Reader {
-//	return strings.NewReader(`
-//		{
-//			"first_name": "James",
-//			"last_name": "Bond",
-//			"gender": "male",
-//			"birthday": "2000-01-08",
-//			"launchpad_id": "5e9e4502f5090995de566f86",
-//			"destination": "Mars",
-//			"launch_date": "2008-08-03"
-//		}`)
-//}
+func createBookingNotExistingLaunchpadBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "111111111111111111111111",
+			"destination": "Mars",
+			"launch_date": "2008-08-03"
+		}`)
+}
+
+func createBookingRetiredLaunchpadBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "5e9e4502f5090995de566f86",
+			"destination": "Mars",
+			"launch_date": "2008-08-03"
+		}`)
+}
+
+func createBookingPlannedExternalBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "5e9e4501f509094ba4566f84",
+			"destination": "Mars",
+			"launch_date": "2014-01-06"
+		}`)
+}

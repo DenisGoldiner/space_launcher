@@ -13,3 +13,7 @@ type Launchpad struct {
 	Region   string
 	Status   string
 }
+
+func (lp Launchpad) IsZero() bool {
+	return lp == Launchpad{}
+}

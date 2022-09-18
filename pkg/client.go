@@ -34,19 +34,19 @@ func NewDefaultClient() Client {
 }
 
 // SendRequest to send request to external services
-func (c *Client) SendRequest(req *http.Request) (io.ReadCloser, error) {
+func (c *Client) SendRequest(req *http.Request) (int, io.ReadCloser, error) {
 	c.setHeader(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return nil, err
+		return 0, nil, err
 	}
 
 	if err := handleError(resp); err != nil {
-		return nil, err
+		return resp.StatusCode, nil, err
 	}
 
-	return resp.Body, nil
+	return resp.StatusCode, resp.Body, nil
 }
 
 func (c *Client) setHeader(req *http.Request) {

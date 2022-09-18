@@ -77,6 +77,47 @@ func Test_integration_CreateBooking_requestValidation(t *testing.T) {
 	}
 }
 
+func Test_integration_CreateBooking_businessValidation(t *testing.T) {
+	t.Parallel()
+
+	testCases := map[string]struct {
+		expResponseErr string
+	}{
+		"not_existing_launchpad": {
+			expResponseErr: "the launchpad does not exist; the business validation was failed",
+		},
+		"retired_launchpad": {
+			expResponseErr: "can not plan booking for retired launchpad; the business validation was failed",
+		},
+		"planned_external": {
+			expResponseErr: "external booking; the launch date is planned; the business validation was failed",
+		},
+		//"planned_internal":       {},
+		//"destination_duplicate":  {},
+	}
+
+	// we will fail without persisting any data to DB.
+	dbExec := setupDB(t)
+	router := newTestRouter(dbExec)
+
+	for tcName, tc := range testCases {
+		tcName, tc := tcName, tc
+
+		t.Run(tcName, func(t *testing.T) {
+			body := getCreateBookingBody(t, tcName)
+
+			req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, bookingsURL, body)
+			require.NoError(t, err)
+			recorder := httptest.NewRecorder()
+			router.ServeHTTP(recorder, req)
+
+			// final test result comparison
+			require.Equal(t, http.StatusBadRequest, recorder.Code)
+			require.Equal(t, fmt.Sprintln(tc.expResponseErr), recorder.Body.String())
+		})
+	}
+}
+
 //func Test_integration_CreateBooking_ok(t *testing.T) {
 //	dbExec := setupDB(t)
 //
