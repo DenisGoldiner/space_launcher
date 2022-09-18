@@ -13,12 +13,12 @@ func NewRouter(handlers map[string]http.Handler) http.Handler {
 	r := http.NewServeMux()
 
 	for route, handler := range handlers {
-		r.Handle(buildHandlerURL(route), handler)
+		r.Handle(BuildHandlerURL(route), handler)
 	}
 
 	return r
 }
 
-func buildHandlerURL(route string) string {
+func BuildHandlerURL(route string) string {
 	return fmt.Sprintf("%s%s", appBaseURL, route)
 }

@@ -18,7 +18,8 @@ import (
 )
 
 const (
-	failedToStartMsg = "failed to start the space_launcher"
+	failedToStartMsg  = "failed to start the space_launcher"
+	runMigrationsPath = "./migrations"
 )
 
 func RunApp() error {
@@ -42,7 +43,7 @@ func RunApp() error {
 		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
 	}
 
-	if err := MigrateUp(dbCon); err != nil {
+	if err := MigrateUp(dbCon, runMigrationsPath); err != nil {
 		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
 	}
 

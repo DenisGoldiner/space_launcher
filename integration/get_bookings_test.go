@@ -10,12 +10,14 @@ import (
 )
 
 func Test_integration_GetBookings_ok(t *testing.T) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, "/bookings", nil)
+	dbExec := setupDB(t)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, bookingsURL, http.NoBody)
 	require.NoError(t, err)
 	recorder := httptest.NewRecorder()
-	router := newTestRouter(t)
+	router := newTestRouter(dbExec)
 
-	expectedBody := "null"
+	expectedBody := "[]"
 
 	router.ServeHTTP(recorder, req)
 

@@ -12,11 +12,9 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
-const migrationsPath = "./migrations"
-
 // MigrateUp will run the migrations
-func MigrateUp(db *sqlx.DB) error {
-	m, err := setupMigrate(db)
+func MigrateUp(db *sqlx.DB, migrationPath string) error {
+	m, err := setupMigrate(db, migrationPath)
 	if err != nil {
 		return err
 	}
@@ -31,14 +29,14 @@ func MigrateUp(db *sqlx.DB) error {
 	return nil
 }
 
-func setupMigrate(db *sqlx.DB) (*migrate.Migrate, error) {
+func setupMigrate(db *sqlx.DB, migrationPath string) (*migrate.Migrate, error) {
 	conn, err := postgres.WithInstance(db.DB, &postgres.Config{})
 	if err != nil {
 		return nil, pkg.WrapErr("failed to connect to the database", err)
 	}
 
-	source := fmt.Sprintf("file://%s", migrationsPath)
-	m, err := migrate.NewWithDatabaseInstance(source, driverName, conn)
+	source := fmt.Sprintf("file://%s", migrationPath)
+	m, err := migrate.NewWithDatabaseInstance(source, DriverName, conn)
 	if err != nil {
 		return nil, pkg.WrapErr("failed to create a migrate instance", err)
 	}

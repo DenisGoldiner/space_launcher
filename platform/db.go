@@ -4,11 +4,11 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-const driverName = "postgres"
+const DriverName = "postgres"
 
 // NewConnection create a connection to a postgres
 func NewConnection(conf DBConfig) (*sqlx.DB, error) {
-	conn, err := sqlx.Open(driverName, conf.DSN)
+	conn, err := sqlx.Open(DriverName, conf.DSN)
 	if err != nil {
 		return nil, err
 	}

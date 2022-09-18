@@ -10,10 +10,12 @@ import (
 )
 
 func Test_integration_DeleteBooking_ok(t *testing.T) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, "/bookings", nil)
+	dbExec := setupDB(t)
+
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, bookingsURL, http.NoBody)
 	require.NoError(t, err)
 	recorder := httptest.NewRecorder()
-	router := newTestRouter(t)
+	router := newTestRouter(dbExec)
 
 	router.ServeHTTP(recorder, req)
 
