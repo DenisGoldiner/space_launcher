@@ -37,11 +37,9 @@ Please use github.
 Commit your changes often. Do not push the whole project in one commit.
 
 ## TODO:
-- check UTC dates + rounding
 - add validation on used Destination per launchpad per week
 - add planed time validation (not to plan in the past)
 - add test coverage
-- improve error messages
 - improve logging
 - make the naming conventional & consistent
 - revise the package structure

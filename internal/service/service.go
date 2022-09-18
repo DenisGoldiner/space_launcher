@@ -99,14 +99,14 @@ func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.
 func (sls SpaceLauncherService) validateInternalBookings(ctx context.Context, l entities.Launch) error {
 	_, err := sls.LaunchRepo.GetLaunch(ctx, sls.DBCon, l.LaunchpadID, l.LaunchDate)
 	if errors.Is(err, sql.ErrNoRows) {
-		return pkg.WrapErr("internal booking", TakenDateErr)
+		return nil
 	}
 
 	if err != nil {
 		return err
 	}
 
-	return nil
+	return pkg.WrapErr("internal booking", TakenDateErr)
 }
 
 func (sls SpaceLauncherService) validateLaunchpadReadiness(ctx context.Context, l entities.Launch) error {
