@@ -9,7 +9,6 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 	"io"
 	"net/http"
-	"time"
 )
 
 const (
@@ -46,6 +45,6 @@ func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, launchpadID string) (e
 	return entities.Launchpad(launchpad), nil
 }
 
-func (sxc SpaceXClient) GetConflictingLaunches(ctx context.Context, launchpadID string, date time.Time) (entities.Launch, error) {
-	return entities.Launch{}, errors.New("not implemented")
+func (sxc SpaceXClient) GetPlannedLaunches(ctx context.Context, launchpadID string, timeRange entities.TimeRange) ([]entities.Launch, error) {
+	return nil, errors.New("not implemented")
 }

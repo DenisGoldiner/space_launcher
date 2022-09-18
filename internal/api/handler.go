@@ -86,7 +86,7 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 		return
 	}
 
-	log.Printf("%#v", payload)
+	//log.Printf("%#v", payload)
 
 	usr := entities.User{
 		FirstName: payload.FirstName,

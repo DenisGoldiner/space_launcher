@@ -1,5 +1,9 @@
 package entities
 
+const (
+	LaunchpadStatusRetired = "retired"
+)
+
 type Launchpad struct {
 	ID       string
 	Name     string

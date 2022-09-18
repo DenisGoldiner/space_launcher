@@ -7,7 +7,6 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 	"github.com/jmoiron/sqlx"
 	"log"
-	"time"
 )
 
 type LaunchDBRequester interface {
@@ -24,7 +23,7 @@ type UserDBRequester interface {
 
 type SpaceXAdapter interface {
 	GetLaunchpad(ctx context.Context, launchpadID string) (entities.Launchpad, error)
-	GetConflictingLaunches(ctx context.Context, launchpadID string, date time.Time) (entities.Launch, error)
+	GetPlannedLaunches(ctx context.Context, launchpadID string, timeRange entities.TimeRange) ([]entities.Launch, error)
 }
 
 type SpaceLauncherService struct {
@@ -82,7 +81,21 @@ func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.
 		return err
 	}
 
-	log.Printf("%#v", foundLaunchpad)
+	if foundLaunchpad.Status == entities.LaunchpadStatusRetired {
+		return errors.New("can not plan booking for retired launchpad")
+	}
+
+	timeRange := entities.ToDayRange(l.LaunchDate)
+	plannedExternalLaunches, err := sls.SpaceXClient.GetPlannedLaunches(ctx, l.LaunchpadID, timeRange)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("%#v", plannedExternalLaunches)
+
+	if len(plannedExternalLaunches) > 0 {
+		return errors.New("the date is planned by an external vendor")
+	}
 
 	return nil
 }
