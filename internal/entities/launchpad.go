@@ -4,6 +4,8 @@ const (
 	LaunchpadStatusRetired = "retired"
 )
 
+type LaunchpadID = string
+
 type Launchpad struct {
 	ID       string
 	Name     string

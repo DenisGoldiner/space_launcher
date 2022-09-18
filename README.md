@@ -37,7 +37,6 @@ Please use github.
 Commit your changes often. Do not push the whole project in one commit.
 
 ## TODO:
-- add validation on used Destination per launchpad per week
 - add planed time validation (not to plan in the past)
 - add test coverage
 - improve logging

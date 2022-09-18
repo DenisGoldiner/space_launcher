@@ -17,3 +17,10 @@ func ToDayRange(t time.Time) TimeRange {
 		To:   t.Add(dayDuration),
 	}
 }
+
+func ToMiddleWeekRange(t time.Time) TimeRange {
+	return TimeRange{
+		From: t.Add(-4 * dayDuration),
+		To:   t.Add(4 * dayDuration),
+	}
+}

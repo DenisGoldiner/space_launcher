@@ -39,6 +39,29 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 	}
 	defer func() { _ = rows.Close() }()
 
+	return scanLaunches(rows)
+}
+
+func (lr LaunchRepo) GetPadLaunches(
+	ctx context.Context,
+	dbExec sqlx.ExtContext,
+	launchpadID string,
+	launchDateRange entities.TimeRange,
+) ([]entities.Launch, error) {
+	getAllLaunchesQuery := `
+		SELECT id, launchpad_id, destination, launch_date, user_id FROM "launch"
+		WHERE launchpad_id = $1 AND launch_date >= $2 AND launch_date < $3`
+
+	rows, err := dbExec.QueryxContext(ctx, getAllLaunchesQuery, launchpadID, launchDateRange.From, launchDateRange.To)
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = rows.Close() }()
+
+	return scanLaunches(rows)
+}
+
+func scanLaunches(rows *sqlx.Rows) ([]entities.Launch, error) {
 	var allLaunches []entities.Launch
 
 	for rows.Next() {
@@ -51,26 +74,6 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 	}
 
 	return allLaunches, nil
-}
-
-func (lr LaunchRepo) GetLaunch(
-	ctx context.Context,
-	dbExec sqlx.ExtContext,
-	launchpadID string,
-	launchDate time.Time,
-) (entities.Launch, error) {
-	getAllLaunchesQuery := `
-		SELECT id, launchpad_id, destination, launch_date, user_id FROM "launch"
-		WHERE launchpad_id = $1 AND launch_date = $2`
-
-	var launch LaunchEntity
-
-	err := dbExec.QueryRowxContext(ctx, getAllLaunchesQuery, launchpadID, launchDate).StructScan(&launch)
-	if err != nil {
-		return entities.Launch{}, err
-	}
-
-	return launch.toEntitiesLaunch(), nil
 }
 
 func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error {

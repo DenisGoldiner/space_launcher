@@ -2,32 +2,30 @@ package service
 
 import (
 	"context"
-	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/jmoiron/sqlx"
-	"time"
-
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"github.com/DenisGoldiner/space_launcher/pkg"
+	"github.com/jmoiron/sqlx"
+	"time"
 )
 
 type LaunchDBRequester interface {
-	SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error
-	GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error)
-	GetLaunch(ctx context.Context, dbExec sqlx.ExtContext, lID string, lDate time.Time) (entities.Launch, error)
+	SaveLaunch(context.Context, sqlx.ExtContext, entities.User, entities.Launch) error
+	GetAllLaunches(context.Context, sqlx.ExtContext) ([]entities.Launch, error)
+	GetPadLaunches(context.Context, sqlx.ExtContext, entities.LaunchpadID, entities.TimeRange) ([]entities.Launch, error)
 }
 
 type UserDBRequester interface {
-	SaveUser(ctx context.Context, dbExec sqlx.ExtContext, u entities.User) (entities.User, error)
-	GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error)
+	SaveUser(context.Context, sqlx.ExtContext, entities.User) (entities.User, error)
+	GetAllUsers(context.Context, sqlx.ExtContext) ([]entities.User, error)
 }
 
 // TODO: rename it to something abstract
 
 type SpaceXAdapter interface {
-	GetLaunchpad(ctx context.Context, launchpadID string) (entities.Launchpad, error)
-	GetPlannedLaunches(ctx context.Context, launchpadID string, timeRange entities.TimeRange) ([]entities.Launch, error)
+	GetLaunchpad(context.Context, entities.LaunchpadID) (entities.Launchpad, error)
+	GetPlannedLaunches(context.Context, entities.LaunchpadID, entities.TimeRange) ([]entities.Launch, error)
 }
 
 type SpaceLauncherService struct {
@@ -69,7 +67,7 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
 	err := sls.validateBooking(ctx, l)
-	if errors.Is(err, RetiredLaunchpadErr) || errors.Is(err, TakenDateErr) {
+	if sls.isValidationErrors(err) {
 		return pkg.WrapErr(err.Error(), BusinessValidationErr)
 	}
 
@@ -78,6 +76,22 @@ func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.Us
 	}
 
 	return sls.createBooking(ctx, u, l)
+}
+
+func (sls SpaceLauncherService) isValidationErrors(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	validationErrors := [...]error{RetiredLaunchpadErr, TakenDateErr, TakenDestinationErr}
+
+	for _, validationError := range validationErrors {
+		if errors.Is(err, validationError) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.Launch) error {
@@ -97,16 +111,27 @@ func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.
 }
 
 func (sls SpaceLauncherService) validateInternalBookings(ctx context.Context, l entities.Launch) error {
-	_, err := sls.LaunchRepo.GetLaunch(ctx, sls.DBCon, l.LaunchpadID, l.LaunchDate)
-	if errors.Is(err, sql.ErrNoRows) {
-		return nil
-	}
-
+	timeRange := entities.ToMiddleWeekRange(l.LaunchDate)
+	foundLaunches, err := sls.LaunchRepo.GetPadLaunches(ctx, sls.DBCon, l.LaunchpadID, timeRange)
 	if err != nil {
 		return err
 	}
 
-	return pkg.WrapErr("internal booking", TakenDateErr)
+	if len(foundLaunches) == 0 {
+		return nil
+	}
+
+	for _, fl := range foundLaunches {
+		if l.LaunchDate.Equal(fl.LaunchDate) {
+			return pkg.WrapErr("internal booking", TakenDateErr)
+		}
+
+		if l.Destination == fl.Destination {
+			return pkg.WrapErr(fmt.Sprintf("exists for %s", fl.LaunchDate.Format(time.RFC3339)), TakenDestinationErr)
+		}
+	}
+
+	return nil
 }
 
 func (sls SpaceLauncherService) validateLaunchpadReadiness(ctx context.Context, l entities.Launch) error {

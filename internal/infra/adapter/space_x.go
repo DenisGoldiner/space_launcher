@@ -20,8 +20,8 @@ type SpaceXClient struct {
 	Client pkg.Client
 }
 
-func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, launchpadID string) (entities.Launchpad, error) {
-	endpoint := fmt.Sprintf(`%s/v4/launchpads/%s`, spaceXURL, launchpadID)
+func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, lID entities.LaunchpadID) (entities.Launchpad, error) {
+	endpoint := fmt.Sprintf(`%s/v4/launchpads/%s`, spaceXURL, lID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, http.NoBody)
 	if err != nil {
@@ -46,12 +46,16 @@ func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, launchpadID string) (e
 	return entities.Launchpad(launchpad), nil
 }
 
-func (sxc SpaceXClient) GetPlannedLaunches(ctx context.Context, launchpadID string, timeRange entities.TimeRange) ([]entities.Launch, error) {
+func (sxc SpaceXClient) GetPlannedLaunches(
+	ctx context.Context,
+	lID entities.LaunchpadID,
+	timeRange entities.TimeRange,
+) ([]entities.Launch, error) {
 	endpoint := fmt.Sprintf(`%s/v5/launches/query`, spaceXURL)
 
 	queryOptions := QueryOptions{
 		Query{
-			LaunchpadID: launchpadID,
+			LaunchpadID: lID,
 			DateUTC:     TimeRange(timeRange),
 		},
 	}
