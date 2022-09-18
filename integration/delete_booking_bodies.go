@@ -18,6 +18,8 @@ func getDeleteBookingBody(t *testing.T, caseName string) io.Reader {
 		return deleteBookingNotSupportedDestinationBody()
 	case "not_existing_booking":
 		return deleteBookingNotExistingBookingBody()
+	case "ok":
+		return deleteBookingOkBody()
 	default:
 		t.Fail()
 		return nil
@@ -63,5 +65,13 @@ func deleteBookingNotExistingBookingBody() io.Reader {
 			"launchpad_id": "5e9e4502f5090995de566f86",
 			"destination": "Mars",
 			"launch_date": "2008-08-03"
+		}`)
+}
+func deleteBookingOkBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"launchpad_id": "5e9e4501f509094ba4566f84",
+			"destination": "Mars",
+			"launch_date": "2021-01-01"
 		}`)
 }

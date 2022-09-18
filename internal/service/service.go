@@ -16,6 +16,7 @@ type LaunchDBRequester interface {
 	SaveLaunch(context.Context, sqlx.ExtContext, entities.User, entities.Launch) error
 	GetAllLaunches(context.Context, sqlx.ExtContext) ([]entities.Launch, error)
 	GetPadLaunches(context.Context, sqlx.ExtContext, entities.LaunchpadID, entities.TimeRange) ([]entities.Launch, error)
+	DeleteLaunch(context.Context, sqlx.ExtContext, entities.Launch) error
 }
 
 type UserDBRequester interface {
@@ -218,5 +219,5 @@ func (sls SpaceLauncherService) validateBookingExists(ctx context.Context, l ent
 		return pkg.WrapErr(fmt.Sprintf("for launchpadID: %q, date %q", l.LaunchpadID, dateFormated), BookingNotFoundErr)
 	}
 
-	return nil
+	return sls.LaunchRepo.DeleteLaunch(ctx, sls.DBCon, l)
 }

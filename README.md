@@ -41,8 +41,6 @@ Commit your changes often. Do not push the whole project in one commit.
 - make the naming conventional & consistent
 - revise the package structure
 - add destination table in DB
-- add booking status
-- add delete endpoint
 - add swagger contracts
 - add documentation
 - add Makefile

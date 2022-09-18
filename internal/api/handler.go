@@ -3,14 +3,12 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"github.com/DenisGoldiner/space_launcher/pkg"
 	"log"
 	"net/http"
 
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
-	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 const (
@@ -99,17 +97,6 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func handleCreateBookingError(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, service.BusinessValidationErr):
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	case errors.Is(err, service.ExternalVendorAPIErr):
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
 func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
 
@@ -139,15 +126,6 @@ func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http
 	}
 
 	w.WriteHeader(http.StatusNoContent)
-}
-
-func handleDeleteBookingError(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, service.BookingNotFoundErr):
-		http.Error(w, err.Error(), http.StatusNotFound)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
 }
 
 // WriteJSON with http.ResponseWriter.

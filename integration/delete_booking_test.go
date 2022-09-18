@@ -3,11 +3,12 @@ package integration
 import (
 	"context"
 	"fmt"
-	"github.com/stretchr/testify/require"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_integration_DeleteBooking_requestValidation(t *testing.T) {
@@ -94,15 +95,17 @@ func Test_integration_DeleteBooking_businessValidation(t *testing.T) {
 	}
 }
 
-//func Test_integration_DeleteBooking_ok(t *testing.T) {
-//	dbExec := setupDB(t)
-//
-//	req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, bookingsURL, http.NoBody)
-//	require.NoError(t, err)
-//	recorder := httptest.NewRecorder()
-//	router := newTestRouter(dbExec)
-//
-//	router.ServeHTTP(recorder, req)
-//
-//	require.Equal(t, http.StatusNoContent, recorder.Code)
-//}
+func Test_integration_DeleteBooking_ok(t *testing.T) {
+	dbExec := setupDB(t)
+
+	body := getDeleteBookingBody(t, "ok")
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodDelete, bookingsURL, body)
+	require.NoError(t, err)
+	recorder := httptest.NewRecorder()
+	router := newTestRouter(dbExec)
+
+	router.ServeHTTP(recorder, req)
+
+	// final test result comparison
+	require.Equal(t, http.StatusNoContent, recorder.Code)
+}
