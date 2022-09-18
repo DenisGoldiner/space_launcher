@@ -35,3 +35,21 @@ When you create an endpoint to delete booking.
 Please use Golang and Postgres.
 Please use github.
 Commit your changes often. Do not push the whole project in one commit.
+
+## TODO:
+- add API validations
+- add validations on existing booking
+- add validation on used Destination per launchpad per week
+- add planed time validation (not to plan in the past)
+- add test coverage
+- improve error messages
+- improve logging
+- make the naming conventional & consistent
+- revise the package structure
+- add destination table in DB
+- add booking status
+- add delete endpoint
+- add swagger contracts
+- add documentation
+- add Makefile
+- add linters

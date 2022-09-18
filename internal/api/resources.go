@@ -60,16 +60,12 @@ type UserResource struct {
 	Birthday  DateResource    `json:"birthday"`
 }
 
-// TODO: make the Destination an entity in the DB with its ID
-
 // LaunchResource represents the launch information.
 type LaunchResource struct {
 	LaunchpadID string       `json:"launchpad_id"`
 	Destination string       `json:"destination"`
 	LaunchDate  DateResource `json:"launch_date"`
 }
-
-// TODO: add validation
 
 type DateResource time.Time
 

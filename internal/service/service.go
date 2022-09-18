@@ -65,8 +65,6 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 	return allBookings, nil
 }
 
-// TODO: validate unique destinations per week
-
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
 	if err := sls.validateBooking(ctx, l); err != nil {
 		return err
