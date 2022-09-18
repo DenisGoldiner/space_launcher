@@ -2,18 +2,19 @@ package integration
 
 import (
 	"fmt"
-	"github.com/DenisGoldiner/space_launcher/pkg"
-	"github.com/DenisGoldiner/space_launcher/platform"
-	"github.com/jmoiron/sqlx"
-	"github.com/stretchr/testify/require"
 	"net/http"
 	"os"
 	"testing"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/stretchr/testify/require"
 
 	"github.com/DenisGoldiner/space_launcher/internal/api"
 	"github.com/DenisGoldiner/space_launcher/internal/infra/adapter"
 	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
 	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/DenisGoldiner/space_launcher/pkg"
+	"github.com/DenisGoldiner/space_launcher/platform"
 )
 
 const (

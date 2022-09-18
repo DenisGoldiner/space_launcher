@@ -2,11 +2,11 @@ package api
 
 import (
 	"fmt"
-	"github.com/DenisGoldiner/space_launcher/pkg"
 	"strings"
 	"time"
 
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 const (

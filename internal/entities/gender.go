@@ -3,6 +3,7 @@ package entities
 import (
 	"errors"
 	"fmt"
+
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
