@@ -2,6 +2,7 @@ package platform
 
 import (
 	"context"
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -17,11 +18,12 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
-const (
-	failedToStartMsg  = "failed to start the space_launcher"
-	runMigrationsPath = "./migrations"
-)
+const runMigrationsPath = "./migrations"
 
+// FailedToStartErr the HTTP server can't be started, preparation failed.
+var FailedToStartErr = errors.New("failed to start the space_launcher")
+
+// RunApp runs the space_launcher application and starts the HTTP server.
 func RunApp() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
@@ -35,16 +37,16 @@ func RunApp() error {
 
 	conf, err := LoadConfig()
 	if err != nil {
-		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+		return pkg.WrapErr(err.Error(), FailedToStartErr)
 	}
 
 	dbCon, err := NewConnection(conf.DBConfig)
 	if err != nil {
-		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+		return pkg.WrapErr(err.Error(), FailedToStartErr)
 	}
 
 	if err := MigrateUp(dbCon, runMigrationsPath); err != nil {
-		log.Fatalf("%s, cause: %v", failedToStartMsg, err)
+		return pkg.WrapErr(err.Error(), FailedToStartErr)
 	}
 
 	handlers := buildHandlers(dbCon)

@@ -15,6 +15,7 @@ const (
 	defaultAddr         = ":8000"
 )
 
+// RunHTTPServer starts the HTTP Server listening the port, blocking operation.
 func RunHTTPServer(ctx context.Context, handler http.Handler) {
 	server := http.Server{
 		Handler:           handler,
@@ -24,7 +25,7 @@ func RunHTTPServer(ctx context.Context, handler http.Handler) {
 		WriteTimeout:      defaultWriteTimeout,
 	}
 
-	log.Println("starting the server")
+	log.Println("starting the HTTP server")
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil {
@@ -38,7 +39,7 @@ func RunHTTPServer(ctx context.Context, handler http.Handler) {
 
 	<-ctx.Done()
 
-	log.Println("stopping the server")
+	log.Println("stopping the HTTP server")
 
 	shutdownCtx, httpCancel := context.WithTimeout(context.Background(), shutdownTimeout)
 	defer httpCancel()
