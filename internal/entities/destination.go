@@ -8,30 +8,31 @@ import (
 )
 
 const (
-	MarsDest         = "Mars"
-	MoonDest         = "Moon"
-	PlutoDest        = "Pluto"
-	AsteroidBeltDest = "Asteroid Belt"
-	EuropaDest       = "Europa"
-	TitanDest        = "Titan"
-	GanymedeDest     = "Ganymede"
+	marsDest         = "Mars"
+	moonDest         = "Moon"
+	plutoDest        = "Pluto"
+	asteroidBeltDest = "Asteroid Belt"
+	europaDest       = "Europa"
+	titanDest        = "Titan"
+	ganymedeDest     = "Ganymede"
 )
 
-var (
-	NotSupportedDestinationErr = errors.New("destination not supported")
-)
+// NotSupportedDestinationErr validation error for the enum Destination.
+var NotSupportedDestinationErr = errors.New("destination not supported")
 
+// Destination enum for launch destinations.
 type Destination string
 
+// Validate checks if the value is a supported launch destination.
 func (d Destination) Validate() error {
 	supportedDestinations := [...]Destination{
-		MarsDest,
-		MoonDest,
-		PlutoDest,
-		AsteroidBeltDest,
-		EuropaDest,
-		TitanDest,
-		GanymedeDest,
+		marsDest,
+		moonDest,
+		plutoDest,
+		asteroidBeltDest,
+		europaDest,
+		titanDest,
+		ganymedeDest,
 	}
 
 	for _, expDest := range supportedDestinations {

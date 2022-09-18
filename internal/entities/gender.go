@@ -8,21 +8,19 @@ import (
 )
 
 const (
-	// MaleGender `male` enum value
-	MaleGender = "male"
-	// FemaleGender `female` enum value
-	FemaleGender = "female"
+	maleGender   = "male"
+	femaleGender = "female"
 )
 
-var (
-	NotSupportedGenderErr = errors.New("gender not supported")
-)
+// NotSupportedGenderErr validation error for the enum Gender.
+var NotSupportedGenderErr = errors.New("gender not supported")
 
 // Gender is an enum type needed to cover non-binary genders if needed.
 type Gender string
 
+// Validate checks if the value is a supported gender.
 func (g Gender) Validate() error {
-	supportedGenders := [...]Gender{MaleGender, FemaleGender}
+	supportedGenders := [...]Gender{maleGender, femaleGender}
 
 	for _, expGender := range supportedGenders {
 		if g == expGender {
