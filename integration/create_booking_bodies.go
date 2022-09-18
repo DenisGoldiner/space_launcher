@@ -34,6 +34,12 @@ func getCreateBookingBody(t *testing.T, caseName string) io.Reader {
 		return createBookingRetiredLaunchpadBody()
 	case "planned_external":
 		return createBookingPlannedExternalBody()
+	case "planned_internal":
+		return createBookingPlannedInternalBody()
+	case "destination_duplicate":
+		return createBookingDestinationDuplicateBody()
+	case "ok":
+		return createBookingOkBody()
 	default:
 		t.Fail()
 		return nil
@@ -199,5 +205,44 @@ func createBookingPlannedExternalBody() io.Reader {
 			"launchpad_id": "5e9e4501f509094ba4566f84",
 			"destination": "Mars",
 			"launch_date": "2014-01-06"
+		}`)
+}
+
+func createBookingPlannedInternalBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "5e9e4501f509094ba4566f84",
+			"destination": "Mars",
+			"launch_date": "2021-01-01"
+		}`)
+}
+
+func createBookingDestinationDuplicateBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "5e9e4501f509094ba4566f84",
+			"destination": "Mars",
+			"launch_date": "2021-01-02"
+		}`)
+}
+
+func createBookingOkBody() io.Reader {
+	return strings.NewReader(`
+		{
+			"first_name": "James",
+			"last_name": "Bond",
+			"gender": "male",
+			"birthday": "2000-01-08",
+			"launchpad_id": "5e9e4501f509094ba4566f84",
+			"destination": "Moon",
+			"launch_date": "2021-01-02"
 		}`)
 }

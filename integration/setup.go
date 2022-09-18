@@ -43,7 +43,7 @@ func newTestRouter(dbCon *sqlx.DB) http.Handler {
 	return r
 }
 
-func setupDB(t testing.TB) *sqlx.DB {
+func setupDB(t *testing.T) *sqlx.DB {
 	dsn := fmt.Sprintf("%s&intervalstyle=iso_8601&search_path=%s", getDSN(), t.Name())
 	testDB, err := sqlx.Open(platform.DriverName, dsn)
 	require.NoError(t, err)
@@ -59,6 +59,8 @@ func setupDB(t testing.TB) *sqlx.DB {
 	err = platform.MigrateUp(testDB, testMigrationsPath)
 	require.NoError(t, err)
 
+	setupFixtures(t, testDB)
+
 	return testDB
 }
 
@@ -70,4 +72,22 @@ func getDSN() string {
 	}
 
 	return dsn
+}
+
+func setupFixtures(t *testing.T, dbExec *sqlx.DB) {
+	userFixtureQuery := `
+		INSERT INTO "user" (first_name, last_name, gender, birthday)
+		VALUES ('John', 'Smith', 'male', '1999-01-08') RETURNING id`
+
+	var userID string
+
+	err := dbExec.QueryRowx(userFixtureQuery).Scan(&userID)
+	require.NoError(t, err)
+
+	launchFixtureQuery := `
+		INSERT INTO "launch" (launchpad_id, destination, launch_date, user_id)
+		VALUES ('5e9e4501f509094ba4566f84', 'Mars', '2021-01-01', $1)`
+
+	_, err = dbExec.Exec(launchFixtureQuery, userID)
+	require.NoError(t, err)
 }

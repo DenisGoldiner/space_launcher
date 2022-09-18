@@ -14,42 +14,42 @@ func Test_integration_CreateBooking_requestValidation(t *testing.T) {
 	t.Parallel()
 
 	testCases := map[string]struct {
-		body           io.Reader
-		expResponseErr string
+		body   io.Reader
+		expErr string
 	}{
 		"no_body": {
-			body:           http.NoBody,
-			expResponseErr: "there is no request body, but it is expected",
+			body:   http.NoBody,
+			expErr: "there is no request body, but it is expected",
 		},
 		"empty_first_name": {
-			expResponseErr: "for the user First Name; field should not be empty; the request validation failed",
+			expErr: "for the user First Name; field should not be empty; the request validation failed",
 		},
 		"empty_last_name": {
-			expResponseErr: "for the user Last Name; field should not be empty; the request validation failed",
+			expErr: "for the user Last Name; field should not be empty; the request validation failed",
 		},
 		"empty_birthday": {
-			expResponseErr: "for the user Birthday; field should not be empty; the request validation failed",
+			expErr: "for the user Birthday; field should not be empty; the request validation failed",
 		},
 		"invalid_birthday_format": {
-			expResponseErr: "parsing time \"2000-01-08T15:04:05Z07:00\": extra text: \"T15:04:05Z07:00\"; failed to decode the body",
+			expErr: "parsing time \"2000-01-08T15:04:05Z07:00\": extra text: \"T15:04:05Z07:00\"; failed to decode the body",
 		},
 		"empty_gender": {
-			expResponseErr: "for the value \"\"; gender not supported; the request validation failed",
+			expErr: "for the value \"\"; gender not supported; the request validation failed",
 		},
 		"not_supported_gender": {
-			expResponseErr: "for the value \"qwerty\"; gender not supported; the request validation failed",
+			expErr: "for the value \"qwerty\"; gender not supported; the request validation failed",
 		},
 		"empty_launchpad_id": {
-			expResponseErr: "for the launchpad id; field should not be empty; the request validation failed",
+			expErr: "for the launchpad id; field should not be empty; the request validation failed",
 		},
 		"empty_launch_date": {
-			expResponseErr: "for the launch date; field should not be empty; the request validation failed",
+			expErr: "for the launch date; field should not be empty; the request validation failed",
 		},
 		"empty_destination": {
-			expResponseErr: "for the value \"\"; destination not supported; the request validation failed",
+			expErr: "for the value \"\"; destination not supported; the request validation failed",
 		},
 		"not_supported_destination": {
-			expResponseErr: "for the value \"Earth\"; destination not supported; the request validation failed",
+			expErr: "for the value \"Earth\"; destination not supported; the request validation failed",
 		},
 	}
 
@@ -72,7 +72,7 @@ func Test_integration_CreateBooking_requestValidation(t *testing.T) {
 
 			// final test result comparison
 			require.Equal(t, http.StatusBadRequest, recorder.Code)
-			require.Equal(t, fmt.Sprintln(tc.expResponseErr), recorder.Body.String())
+			require.Equal(t, fmt.Sprintln(tc.expErr), recorder.Body.String())
 		})
 	}
 }
@@ -81,19 +81,23 @@ func Test_integration_CreateBooking_businessValidation(t *testing.T) {
 	t.Parallel()
 
 	testCases := map[string]struct {
-		expResponseErr string
+		expErr string
 	}{
 		"not_existing_launchpad": {
-			expResponseErr: "the launchpad does not exist; the business validation was failed",
+			expErr: "the launchpad does not exist; the business validation was failed",
 		},
 		"retired_launchpad": {
-			expResponseErr: "can not plan booking for retired launchpad; the business validation was failed",
+			expErr: "can not plan booking for retired launchpad; the business validation was failed",
 		},
 		"planned_external": {
-			expResponseErr: "external booking; the launch date is planned; the business validation was failed",
+			expErr: "external booking; the launch date is planned; the business validation was failed",
 		},
-		//"planned_internal":       {},
-		//"destination_duplicate":  {},
+		"planned_internal": {
+			expErr: "internal booking; the launch date is planned; the business validation was failed",
+		},
+		"destination_duplicate": {
+			expErr: "exists for 2021-01-01T00:00:00Z; the launch destination is planned for close dates; the business validation was failed",
+		},
 	}
 
 	// we will fail without persisting any data to DB.
@@ -113,21 +117,21 @@ func Test_integration_CreateBooking_businessValidation(t *testing.T) {
 
 			// final test result comparison
 			require.Equal(t, http.StatusBadRequest, recorder.Code)
-			require.Equal(t, fmt.Sprintln(tc.expResponseErr), recorder.Body.String())
+			require.Equal(t, fmt.Sprintln(tc.expErr), recorder.Body.String())
 		})
 	}
 }
 
-//func Test_integration_CreateBooking_ok(t *testing.T) {
-//	dbExec := setupDB(t)
-//
-//	body := strings.NewReader("{}")
-//	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, bookingsURL, body)
-//	require.NoError(t, err)
-//	recorder := httptest.NewRecorder()
-//	router := newTestRouter(dbExec)
-//
-//	router.ServeHTTP(recorder, req)
-//
-//	require.Equal(t, http.StatusNoContent, recorder.Code)
-//}
+func Test_integration_CreateBooking_ok(t *testing.T) {
+	dbExec := setupDB(t)
+
+	body := getCreateBookingBody(t, "ok")
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodPost, bookingsURL, body)
+	require.NoError(t, err)
+	recorder := httptest.NewRecorder()
+	router := newTestRouter(dbExec)
+
+	router.ServeHTTP(recorder, req)
+
+	require.Equal(t, http.StatusNoContent, recorder.Code)
+}
