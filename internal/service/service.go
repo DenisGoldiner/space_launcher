@@ -55,7 +55,7 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 	for _, launch := range allLaunches {
 		user, ok := userMapping[launch.UserID]
 		if !ok {
-			return nil, errors.New("this could not ever happen but it happened, data inconsistency")
+			return nil, errors.New("this could not ever happen but it happened, DB data inconsistency")
 		}
 
 		allBookings[user] = append(allBookings[user], launch)
@@ -66,7 +66,11 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
 	if err := sls.validateBooking(ctx, l); err != nil {
-		return err
+		if errors.Is(err, ExternalVendorAPIErr) {
+			return err
+		}
+
+		return pkg.WrapErr(err.Error(), BusinessValidationErr)
 	}
 
 	return sls.createBooking(ctx, u, l)
@@ -74,19 +78,11 @@ func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.Us
 
 func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.Launch) error {
 	if err := sls.validateLaunchpadReadiness(ctx, l); err != nil {
-		if errors.Is(err, ExternalVendorAPIErr) {
-			return err
-		}
-
-		return pkg.WrapErr(err.Error(), BusinessValidationErr)
+		return err
 	}
 
 	if err := sls.validateExternalBookings(ctx, l); err != nil {
-		if errors.Is(err, ExternalVendorAPIErr) {
-			return err
-		}
-
-		return pkg.WrapErr(err.Error(), BusinessValidationErr)
+		return err
 	}
 
 	return nil

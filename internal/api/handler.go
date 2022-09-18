@@ -52,23 +52,14 @@ func (slh SpaceLauncherHTTPHandler) GetBookings(w http.ResponseWriter, r *http.R
 
 	allBookings, err := slh.Service.GetAllBookings(ctx)
 	if err != nil {
-		handleGetBookingsError(w, err)
+		// all the current errors for get bookings are related to DB interactions
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		logError(err)
 		return
 	}
 
 	if err := WriteJSON(w, http.StatusOK, launchByUsersToResource(allBookings)); err != nil {
 		http.Error(w, fmt.Sprintf("output serialization failed, %v", err), http.StatusInternalServerError)
-	}
-}
-
-func handleGetBookingsError(w http.ResponseWriter, err error) {
-	switch {
-	// TODO: define cases
-	case errors.Is(err, nil):
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
