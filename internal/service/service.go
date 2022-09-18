@@ -2,9 +2,11 @@ package service
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/jmoiron/sqlx"
+	"time"
 
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"github.com/DenisGoldiner/space_launcher/pkg"
@@ -13,6 +15,7 @@ import (
 type LaunchDBRequester interface {
 	SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error
 	GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error)
+	GetLaunch(ctx context.Context, dbExec sqlx.ExtContext, lID string, lDate time.Time) (entities.Launch, error)
 }
 
 type UserDBRequester interface {
@@ -65,12 +68,13 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 }
 
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
-	if err := sls.validateBooking(ctx, l); err != nil {
-		if errors.Is(err, ExternalVendorAPIErr) {
-			return err
-		}
-
+	err := sls.validateBooking(ctx, l)
+	if errors.Is(err, RetiredLaunchpadErr) || errors.Is(err, TakenDateErr) {
 		return pkg.WrapErr(err.Error(), BusinessValidationErr)
+	}
+
+	if err != nil {
+		return err
 	}
 
 	return sls.createBooking(ctx, u, l)
@@ -81,7 +85,24 @@ func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.
 		return err
 	}
 
+	if err := sls.validateInternalBookings(ctx, l); err != nil {
+		return err
+	}
+
 	if err := sls.validateExternalBookings(ctx, l); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (sls SpaceLauncherService) validateInternalBookings(ctx context.Context, l entities.Launch) error {
+	_, err := sls.LaunchRepo.GetLaunch(ctx, sls.DBCon, l.LaunchpadID, l.LaunchDate)
+	if errors.Is(err, sql.ErrNoRows) {
+		return pkg.WrapErr("internal booking", TakenDateErr)
+	}
+
+	if err != nil {
 		return err
 	}
 
@@ -109,7 +130,7 @@ func (sls SpaceLauncherService) validateExternalBookings(ctx context.Context, l 
 	}
 
 	if len(plannedExternalLaunches) > 0 {
-		return TakenDateErr
+		return pkg.WrapErr("external booking", TakenDateErr)
 	}
 
 	return nil
@@ -127,7 +148,7 @@ func (sls SpaceLauncherService) createBooking(ctx context.Context, u entities.Us
 	}
 
 	if err = tx.Commit(); err != nil {
-		return pkg.WrapErr("failed to commit transaction: %w", err)
+		return pkg.WrapErr("failed to commit transaction", err)
 	}
 
 	return nil

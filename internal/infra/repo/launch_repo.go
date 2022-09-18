@@ -53,6 +53,26 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 	return allLaunches, nil
 }
 
+func (lr LaunchRepo) GetLaunch(
+	ctx context.Context,
+	dbExec sqlx.ExtContext,
+	launchpadID string,
+	launchDate time.Time,
+) (entities.Launch, error) {
+	getAllLaunchesQuery := `
+		SELECT id, launchpad_id, destination, launch_date, user_id FROM "launch"
+		WHERE launchpad_id = $1 AND launch_date = $2`
+
+	var launch LaunchEntity
+
+	err := dbExec.QueryRowxContext(ctx, getAllLaunchesQuery, launchpadID, launchDate).StructScan(&launch)
+	if err != nil {
+		return entities.Launch{}, err
+	}
+
+	return launch.toEntitiesLaunch(), nil
+}
+
 func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error {
 	saveLaunchQuery := `INSERT INTO "launch" (launchpad_id, destination, launch_date, user_id) VALUES ($1, $2, $3, $4)`
 	if _, err := dbExec.ExecContext(
