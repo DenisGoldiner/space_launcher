@@ -6,6 +6,7 @@ import (
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
 	"github.com/DenisGoldiner/space_launcher/pkg"
 	"github.com/jmoiron/sqlx"
+	"log"
 	"time"
 )
 
@@ -19,8 +20,10 @@ type UserDBRequester interface {
 	GetAllUsers(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.User, error)
 }
 
+// TODO: rename it to something abstract
+
 type SpaceXAdapter interface {
-	GetLaunchpad(ctx context.Context, launchpadID string) ([]entities.Launchpad, error)
+	GetLaunchpad(ctx context.Context, launchpadID string) (entities.Launchpad, error)
 	GetConflictingLaunches(ctx context.Context, launchpadID string, date time.Time) (entities.Launch, error)
 }
 
@@ -61,11 +64,30 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 	return allBookings, nil
 }
 
-// TODO: call SpaceX API to validate
+// TODO: call SpaceX Client to validate
 
 // TODO: validate unique destinations per week
 
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
+	if err := sls.validateBooking(ctx, l); err != nil {
+		return err
+	}
+
+	return sls.createBooking(ctx, u, l)
+}
+
+func (sls SpaceLauncherService) validateBooking(ctx context.Context, l entities.Launch) error {
+	foundLaunchpad, err := sls.SpaceXClient.GetLaunchpad(ctx, l.LaunchpadID)
+	if err != nil {
+		return err
+	}
+
+	log.Printf("%#v", foundLaunchpad)
+
+	return nil
+}
+
+func (sls SpaceLauncherService) createBooking(ctx context.Context, u entities.User, l entities.Launch) error {
 	tx, err := sls.DBCon.BeginTxx(ctx, nil)
 	if err != nil {
 		return pkg.WrapErr("failed to start the transaction", err)

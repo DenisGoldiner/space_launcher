@@ -6,6 +6,7 @@ import (
 	"github.com/DenisGoldiner/space_launcher/internal/infra/adapter"
 	"github.com/DenisGoldiner/space_launcher/internal/infra/repo"
 	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 	"github.com/jmoiron/sqlx"
 	"log"
 	"net/http"
@@ -52,9 +53,10 @@ func RunApp() error {
 }
 
 func buildHandlers(dbCon *sqlx.DB) map[string]http.Handler {
+	httpClient := pkg.NewDefaultClient()
+	sxc := adapter.SpaceXClient{Client: httpClient}
 	lr := repo.LaunchRepo{}
 	ur := repo.UserRepo{}
-	sxc := adapter.SpaceXClient{}
 	sls := service.SpaceLauncherService{DBCon: dbCon, LaunchRepo: lr, UserRepo: ur, SpaceXClient: sxc}
 	slh := api.SpaceLauncherHTTPHandler{Service: sls}
 
