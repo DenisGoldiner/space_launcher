@@ -9,33 +9,34 @@ import (
 )
 
 const (
-	// AcceptEncodingKey  is http header key for Accept-encoding.
+	// AcceptEncodingKey is a http header key for Accept-encoding.
 	AcceptEncodingKey = "Accept-Encoding"
-	// UTF8Encoding is UTF-8 encoding value
+	// UTF8Encoding is a UTF-8 encoding value
 	UTF8Encoding = "UTF-8"
-	// ContentTypeKey is http header key for content type.
+	// ContentTypeKey is a http header key for content type.
 	ContentTypeKey = "Content-Type"
-	// ContentTypeValueJSON is http header value for application/json.
+	// ContentTypeValueJSON is a http header value for application/json.
 	ContentTypeValueJSON = "application/json; charset=utf-8"
 
 	defaultTimeout = 10 * time.Second
 )
 
-// ClientCallErr is used if the error has been caused by the external Client request execution
+// ClientCallErr is used if the error has been caused by the external Client request execution.
 var ClientCallErr = errors.New("failed to execute an external service Client call")
 
-// Client handles http requests to the external services
+// Client handles http requests to the external services.
 type Client struct {
 	HTTPClient *http.Client
 }
 
+// NewDefaultClient returns Client with default setup.
 func NewDefaultClient() Client {
 	return Client{HTTPClient: &http.Client{Timeout: defaultTimeout}}
 }
 
-// SendRequest to send request to external services
+// SendRequest to send request to external services.
 func (c *Client) SendRequest(req *http.Request) (int, io.ReadCloser, error) {
-	c.setHeader(req)
+	c.setHeaders(req)
 
 	resp, err := c.HTTPClient.Do(req)
 	if err != nil {
@@ -49,7 +50,7 @@ func (c *Client) SendRequest(req *http.Request) (int, io.ReadCloser, error) {
 	return resp.StatusCode, resp.Body, nil
 }
 
-func (c *Client) setHeader(req *http.Request) {
+func (c *Client) setHeaders(req *http.Request) {
 	req.Header.Add(AcceptEncodingKey, UTF8Encoding)
 	req.Header.Add(ContentTypeKey, ContentTypeValueJSON)
 }

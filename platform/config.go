@@ -9,22 +9,23 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
-var (
-	ParseConfigErr = errors.New("failed to parse the config")
-)
+// ParseConfigErr describes an error when `envconfig` failed to process the config.
+var ParseConfigErr = errors.New("failed to parse the config")
 
+// Config keeps all the configurations together.
 type Config struct {
 	DBConfig
 }
 
+// DBConfig is used to setup the postgreSQL DB connection.
 type DBConfig struct {
 	DSN               string        `envconfig:"DB_DSN" required:"true"`
-	MaxOpenConnection int           `envconfig:"MAX_OPEN_CONNECTION" default:"10"`
-	MaxIdleConnection int           `envconfig:"MAX_IDLE_CONNECTION" default:"2"`
 	MaxConnLifetime   time.Duration `envconfig:"MAX_CONNECTION_LIFETIME" default:"10s"`
+	MaxOpenConnection int           `envconfig:"MAX_OPEN_CONNECTION" default:"10"`
+	MaxIdleConnection int           `envconfig:"MAX_IDLE_CONNECTION" default:"10"`
 }
 
-// LoadConfig can be used to retrieve api configuration setup
+// LoadConfig can be used to process configuration setup.
 func LoadConfig() (Config, error) {
 	var conf Config
 

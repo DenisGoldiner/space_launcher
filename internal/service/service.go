@@ -12,6 +12,7 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
+// LaunchDBRequester is a repository layer abstraction for launch actions.
 type LaunchDBRequester interface {
 	SaveLaunch(context.Context, sqlx.ExtContext, entities.User, entities.Launch) error
 	GetAllLaunches(context.Context, sqlx.ExtContext) ([]entities.Launch, error)
@@ -19,25 +20,27 @@ type LaunchDBRequester interface {
 	DeleteLaunch(context.Context, sqlx.ExtContext, entities.Launch) error
 }
 
+// UserDBRequester is a repository layer abstraction for user actions.
 type UserDBRequester interface {
 	SaveUser(context.Context, sqlx.ExtContext, entities.User) (entities.User, error)
 	GetAllUsers(context.Context, sqlx.ExtContext) ([]entities.User, error)
 }
 
-// TODO: rename it to something abstract
-
-type SpaceXAdapter interface {
+// ExternalLaunchService is an adapter layer abstraction for user SpaceX client.
+type ExternalLaunchService interface {
 	GetLaunchpad(context.Context, entities.LaunchpadID) (entities.Launchpad, error)
 	GetPlannedLaunches(context.Context, entities.LaunchpadID, entities.TimeRange) ([]entities.Launch, error)
 }
 
+// SpaceLauncherService is a service layer implementation.
 type SpaceLauncherService struct {
 	DBCon        *sqlx.DB
 	LaunchRepo   LaunchDBRequester
 	UserRepo     UserDBRequester
-	SpaceXClient SpaceXAdapter
+	SpaceXClient ExternalLaunchService
 }
 
+// GetAllBookings returns all existing bookings.
 func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entities.User][]entities.Launch, error) {
 	allUsers, err := sls.UserRepo.GetAllUsers(ctx, sls.DBCon)
 	if err != nil {
@@ -68,6 +71,7 @@ func (sls SpaceLauncherService) GetAllBookings(ctx context.Context) (map[entitie
 	return allBookings, nil
 }
 
+// CreateBooking creates the booking.
 func (sls SpaceLauncherService) CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error {
 	err := sls.validateBooking(ctx, l)
 	if sls.isValidationErrors(err) {
@@ -199,6 +203,7 @@ func (sls SpaceLauncherService) createBookingTx(ctx context.Context, tx *sqlx.Tx
 	return nil
 }
 
+// DeleteBooking deletes the booking.
 func (sls SpaceLauncherService) DeleteBooking(ctx context.Context, l entities.Launch) error {
 	if err := sls.validateBookingExists(ctx, l); err != nil {
 		return err

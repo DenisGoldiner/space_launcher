@@ -16,10 +16,12 @@ const (
 	spaceXURL = "https://api.spacexdata.com"
 )
 
+// SpaceXClient to interact with external service.
 type SpaceXClient struct {
 	Client pkg.Client
 }
 
+// GetLaunchpad retrieves Launchpad by ID from the SpaceX planer.
 func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, lID entities.LaunchpadID) (entities.Launchpad, error) {
 	endpoint := fmt.Sprintf(`%s/v4/launchpads/%s`, spaceXURL, lID)
 
@@ -52,6 +54,7 @@ func (sxc SpaceXClient) GetLaunchpad(ctx context.Context, lID entities.Launchpad
 	return entities.Launchpad(launchpad), nil
 }
 
+// GetPlannedLaunches retrieves Launches list by Launchpad ID and date range from the SpaceX planer.
 func (sxc SpaceXClient) GetPlannedLaunches(
 	ctx context.Context,
 	lID entities.LaunchpadID,
@@ -80,7 +83,7 @@ func (sxc SpaceXClient) GetPlannedLaunches(
 	if err != nil {
 		return nil, pkg.WrapErr("failed execute the request", err)
 	}
-	
+
 	defer func() { _ = responseBody.Close() }()
 
 	b, err := io.ReadAll(responseBody)

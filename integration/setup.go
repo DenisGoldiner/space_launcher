@@ -66,6 +66,7 @@ func setupDB(t *testing.T) *sqlx.DB {
 }
 
 func getDSN() string {
+	// TODO: we should require it to avoid DB access in the code.
 	dsn := "postgres://sl_postgres:password@localhost:5432/space_launcher?sslmode=disable"
 	envValue, exists := os.LookupEnv(dsnEnvVar)
 	if exists {

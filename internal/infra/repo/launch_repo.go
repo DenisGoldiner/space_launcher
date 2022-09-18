@@ -28,8 +28,10 @@ func (le LaunchEntity) toEntitiesLaunch() entities.Launch {
 	}
 }
 
+// LaunchRepo is a repo layer implementation for launch actions.
 type LaunchRepo struct{}
 
+// GetAllLaunches returns all launches from DB.
 func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext) ([]entities.Launch, error) {
 	getAllLaunchesQuery := `SELECT id, launchpad_id, destination, launch_date, user_id FROM "launch"`
 
@@ -42,6 +44,7 @@ func (lr LaunchRepo) GetAllLaunches(ctx context.Context, dbExec sqlx.ExtContext)
 	return scanLaunches(rows)
 }
 
+// GetPadLaunches returns all launches per launchpad in specific date range from DB.
 func (lr LaunchRepo) GetPadLaunches(
 	ctx context.Context,
 	dbExec sqlx.ExtContext,
@@ -76,6 +79,7 @@ func scanLaunches(rows *sqlx.Rows) ([]entities.Launch, error) {
 	return allLaunches, nil
 }
 
+// SaveLaunch persists a launch to DB.
 func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u entities.User, l entities.Launch) error {
 	saveLaunchQuery := `INSERT INTO "launch" (launchpad_id, destination, launch_date, user_id) VALUES ($1, $2, $3, $4)`
 	if _, err := dbExec.ExecContext(
@@ -92,6 +96,7 @@ func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u e
 	return nil
 }
 
+// DeleteLaunch deletes the launch from the DB by launchpad and concrete date.
 func (lr LaunchRepo) DeleteLaunch(ctx context.Context, dbExec sqlx.ExtContext, l entities.Launch) error {
 	saveLaunchQuery := `DELETE FROM "launch" WHERE launchpad_id = $1 AND launch_date = $2`
 	if _, err := dbExec.ExecContext(ctx, saveLaunchQuery, l.LaunchpadID, l.LaunchDate); err == nil {

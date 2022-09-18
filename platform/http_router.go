@@ -5,10 +5,9 @@ import (
 	"net/http"
 )
 
-const (
-	appBaseURL = "/space_launcher"
-)
+const appBaseURL = "/space_launcher"
 
+// NewRouter prepares the HTTP router.
 func NewRouter(handlers map[string]http.Handler) http.Handler {
 	r := http.NewServeMux()
 
@@ -19,6 +18,7 @@ func NewRouter(handlers map[string]http.Handler) http.Handler {
 	return r
 }
 
+// BuildHandlerURL adds the appBaseURL prefix to handler url.
 func BuildHandlerURL(route string) string {
 	return fmt.Sprintf("%s%s", appBaseURL, route)
 }

@@ -67,6 +67,7 @@ func deleteBookingNotExistingBookingBody() io.Reader {
 			"launch_date": "2008-08-03"
 		}`)
 }
+
 func deleteBookingOkBody() io.Reader {
 	return strings.NewReader(`
 		{

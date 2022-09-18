@@ -2,6 +2,7 @@ package entities
 
 import "time"
 
+// Launch domain entity.
 type Launch struct {
 	ID          string
 	LaunchpadID string

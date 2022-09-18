@@ -38,10 +38,7 @@ Commit your changes often. Do not push the whole project in one commit.
 
 ## TODO:
 - add planed time validation (not to plan in the past)
-- make the naming conventional & consistent
-- revise the package structure
 - add destination table in DB
 - add swagger contracts
-- add documentation
 - add Makefile
 - add linters
