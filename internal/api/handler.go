@@ -3,13 +3,12 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/DenisGoldiner/space_launcher/internal/entities"
-	"github.com/DenisGoldiner/space_launcher/internal/service"
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 const (
@@ -20,8 +19,9 @@ const (
 )
 
 type SpaceLauncherInteractor interface {
-	CreateBooking(ctx context.Context, u entities.User, l entities.Launch) error
-	GetAllBookings(ctx context.Context) (map[entities.User][]entities.Launch, error)
+	CreateBooking(context.Context, entities.User, entities.Launch) error
+	GetAllBookings(context.Context) (map[entities.User][]entities.Launch, error)
+	DeleteBooking(context.Context, entities.Launch) error
 }
 
 // SpaceLauncherHTTPHandler is handler for bookings endpoints
@@ -71,8 +71,9 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 
 	ctx := r.Context()
 
-	payload, err := parseCreateBookingRequest(r)
-	if err != nil {
+	var payload BookingResource
+
+	if err := parseCreateBookingRequest(r, &payload); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		logError(err)
 		return
@@ -96,19 +97,33 @@ func (slh SpaceLauncherHTTPHandler) CreateBooking(w http.ResponseWriter, r *http
 	w.WriteHeader(http.StatusNoContent)
 }
 
-func handleCreateBookingError(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Is(err, service.BusinessValidationErr):
-		http.Error(w, err.Error(), http.StatusBadRequest)
-	case errors.Is(err, service.ExternalVendorAPIErr):
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	default:
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
 func (slh SpaceLauncherHTTPHandler) DeleteBooking(w http.ResponseWriter, r *http.Request) {
 	log.Println("DeleteBooking")
+
+	ctx := r.Context()
+
+	var payload LaunchResource
+
+	if err := parseCreateBookingRequest(r, &payload); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logError(err)
+		return
+	}
+
+	if err := payload.Validate(); err != nil {
+		err := pkg.WrapErr(err.Error(), ValidationFailedErr)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		logError(err)
+		return
+	}
+
+	launch := payload.toEntitiesLaunch()
+
+	if err := slh.Service.DeleteBooking(ctx, launch); err != nil {
+		handleDeleteBookingError(w, err)
+		logError(err)
+		return
+	}
 
 	w.WriteHeader(http.StatusNoContent)
 }

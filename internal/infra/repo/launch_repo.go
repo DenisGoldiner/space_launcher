@@ -91,3 +91,12 @@ func (lr LaunchRepo) SaveLaunch(ctx context.Context, dbExec sqlx.ExtContext, u e
 
 	return nil
 }
+
+func (lr LaunchRepo) DeleteLaunch(ctx context.Context, dbExec sqlx.ExtContext, l entities.Launch) error {
+	saveLaunchQuery := `DELETE FROM "launch" WHERE launchpad_id = $1 AND launch_date = $2`
+	if _, err := dbExec.ExecContext(ctx, saveLaunchQuery, l.LaunchpadID, l.LaunchDate); err == nil {
+		return err
+	}
+
+	return nil
+}

@@ -9,17 +9,16 @@ import (
 	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
-func parseCreateBookingRequest(r *http.Request) (BookingResource, error) {
-	var dest BookingResource
-	if err := DecodeJSON(r, &dest); err != nil {
+func parseCreateBookingRequest(r *http.Request, dest any) error {
+	if err := DecodeJSON(r, dest); err != nil {
 		if errors.Is(err, io.EOF) {
-			return BookingResource{}, EmptyBodyErr
+			return EmptyBodyErr
 		}
 
-		return BookingResource{}, pkg.WrapErr(err.Error(), BodyDecodeErr)
+		return pkg.WrapErr(err.Error(), BodyDecodeErr)
 	}
 
-	return dest, nil
+	return nil
 }
 
 // DecodeJSON decode JSON from *http.Request.
