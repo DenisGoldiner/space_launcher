@@ -2,8 +2,10 @@ package platform
 
 import (
 	"errors"
-	"github.com/DenisGoldiner/space_launcher/pkg"
+
 	"github.com/jmoiron/sqlx"
+
+	"github.com/DenisGoldiner/space_launcher/pkg"
 )
 
 // DriverName sqlx driver to be used.
